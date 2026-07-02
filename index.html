@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Taxas — Grupo Águia</title>
+<style>
+:root{--azul:#1B3A5C;--azul-m:#2D5F8A;--azul-c:#4A8FC1;--ciano:#00B4D8;--verde:#22C55E;--verm:#EF4444;--amar:#F59E0B;--cinza-e:#1E293B;--cinza:#64748B;--cinza-c:#E2E8F0;--bg:#F0F4F8;--bco:#fff;--txt:#0F172A;--sh:0 2px 12px rgba(27,58,92,.10);--sh2:0 6px 24px rgba(27,58,92,.18)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+/* HEADER */
+header{background:linear-gradient(135deg,var(--azul) 0%,var(--azul-m) 60%,var(--azul-c) 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1400px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:14px}
+.logo-ic{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;border:1.5px solid rgba(255,255,255,.25)}
+.logo-txt h1{font-size:18px;font-weight:700}
+.logo-txt p{font-size:12px;opacity:.75;margin-top:1px}
+.hdr-date{font-size:12px;opacity:.7;background:rgba(255,255,255,.1);border-radius:8px;padding:6px 12px;border:1px solid rgba(255,255,255,.15)}
+/* TABS */
+.tabs-bar{background:rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.08)}
+.tabs-in{display:flex;max-width:1400px;margin:0 auto;padding:0 28px;gap:2px}
+.tab{padding:12px 20px;border:none;background:transparent;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:#fff;background:rgba(255,255,255,.06)}
+.tab.active{color:#fff;border-bottom-color:var(--ciano);background:rgba(255,255,255,.08);font-weight:600}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--ciano);display:none}
+.tab.active .tdot{display:block}
+/* LAYOUT */
+.main{max-width:1400px;margin:0 auto;padding:28px}
+.sec{display:none}.sec.active{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* SUMMARY CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--bco);border-radius:12px;padding:18px 20px;box-shadow:var(--sh);border:1px solid rgba(0,0,0,.05);transition:box-shadow .2s}
+.card:hover{box-shadow:var(--sh2)}
+.card-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--cinza);margin-bottom:6px}
+.card-val{font-size:22px;font-weight:700;color:var(--azul);line-height:1.1}
+.card-sub{font-size:11px;color:var(--cinza);margin-top:3px}
+.card.cv .card-val{color:var(--verde)}.card.cc .card-val{color:var(--azul-c)}
+/* SEC HEADER */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.sec-ttl{font-size:18px;font-weight:700;color:var(--azul);display:flex;align-items:center;gap:8px}
+.badge{background:var(--azul);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+/* EMPRESA GRID */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.emp-card{background:var(--bco);border-radius:14px;box-shadow:var(--sh);overflow:hidden;border:1px solid rgba(0,0,0,.06);transition:box-shadow .2s,transform .15s;cursor:pointer}
+.emp-card:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.emp-hdr{background:linear-gradient(90deg,var(--azul),var(--azul-m));color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.emp-hdr h3{font-size:14px;font-weight:700}
+.emp-hdr .meta{font-size:11px;opacity:.8;display:flex;align-items:center;gap:6px}
+.emp-body{padding:14px 18px}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--cinza-c);font-size:13px}
+.r-row:last-child{border-bottom:none}
+.r-lbl{display:flex;align-items:center;gap:7px;color:var(--cinza-e)}
+.r-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dj{background:#3B82F6}.de{background:#10B981}.db{background:#F59E0B}.dp{background:#8B5CF6}
+.r-val{font-weight:700;color:var(--azul)}
+.emp-tot{margin-top:10px;padding:9px 12px;background:var(--bg);border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+.emp-tot span:first-child{font-size:11px;font-weight:600;color:var(--cinza);text-transform:uppercase;letter-spacing:.5px}
+.emp-tot span:last-child{font-size:15px;font-weight:800;color:var(--azul)}
+.emp-footer{padding:10px 18px;border-top:1px solid var(--cinza-c);display:flex;align-items:center;justify-content:space-between;background:#F8FAFC}
+.emp-footer span{font-size:11px;color:var(--cinza)}
+.btn-edit{padding:5px 12px;border:1.5px solid var(--azul);background:#fff;color:var(--azul);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-edit:hover{background:var(--azul);color:#fff}
+.btn-sad{padding:5px 11px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.btn-sad:hover{background:#DC2626;color:#fff}
+.btn-rec{padding:5px 11px;border:1.5px solid #059669;background:#fff;color:#059669;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.btn-rec:hover{background:#059669;color:#fff}
+/* MODAL SAD/REC */
+.mo-xml{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;display:none;align-items:center;justify-content:center;padding:14px}
+.mo-xml.open{display:flex}
+.mo-xml-box{background:#fff;border-radius:16px;width:100%;max-width:920px;max-height:95vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:fi .2s ease}
+.mo-xml-hdr{padding:18px 24px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mo-xml-hdr.sad{background:linear-gradient(90deg,#7F1D1D,#DC2626)}
+.mo-xml-hdr.rec{background:linear-gradient(90deg,#064E3B,#059669)}
+.mo-xml-hdr h2{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.mo-xml-hdr .sub{color:rgba(255,255,255,.8);font-size:12px;margin-top:2px}
+.mo-xml-close{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.mo-xml-close:hover{background:rgba(255,255,255,.35)}
+.mo-xml-body{overflow-y:auto;flex:1;padding:20px 24px}
+/* Config strip */
+.xml-cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px;background:#F8FAFC;border-radius:10px;padding:16px;border:1px solid var(--cinza-c)}
+.xml-cfg label{font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:4px}
+.xml-cfg input,.xml-cfg select{width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;background:#fff;font-family:inherit}
+.xml-cfg input:focus,.xml-cfg select:focus{border-color:var(--azul-c)}
+/* Abas por tipo de rateio */
+.xml-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.xml-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--cinza-c);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--cinza)}
+.xml-tab.active-j{border-color:#3B82F6;background:#DBEAFE;color:#1D4ED8}
+.xml-tab.active-e{border-color:#10B981;background:#D1FAE5;color:#065F46}
+.xml-tab.active-b{border-color:#F59E0B;background:#FEF3C7;color:#92400E}
+.xml-tab.active-p{border-color:#8B5CF6;background:#EDE9FE;color:#5B21B6}
+.xml-tab.active-all{border-color:var(--azul);background:var(--azul);color:#fff}
+/* XML preview */
+.xml-preview{background:#0F172A;border-radius:10px;padding:16px;overflow-x:auto;position:relative}
+.xml-preview pre{font-family:'Consolas','Monaco','Courier New',monospace;font-size:12px;line-height:1.6;color:#E2E8F0;white-space:pre;margin:0}
+.xml-preview .xml-tag{color:#7DD3FC}
+.xml-preview .xml-val{color:#86EFAC}
+.xml-preview .xml-comment{color:#94A3B8;font-style:italic}
+.xml-copy{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.xml-copy:hover{background:rgba(255,255,255,.25)}
+.xml-copy.ok{background:#059669;border-color:#059669}
+/* resumo rateio por tipo */
+.tipo-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tipo-resumo-it{border-radius:8px;padding:10px 12px;text-align:center;border:1.5px solid}
+.tipo-resumo-it .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.75}
+.tipo-resumo-it .val{font-size:14px;font-weight:800;margin-top:3px}
+.tipo-resumo-it .pct{font-size:10px;opacity:.65;margin-top:1px}
+/* TABLE */
+.tbl-wrap{background:var(--bco);border-radius:14px;box-shadow:var(--sh);overflow:hidden;border:1px solid rgba(0,0,0,.06)}
+.tbl-tb{padding:12px 16px;border-bottom:1px solid var(--cinza-c);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sbox{display:flex;align-items:center;gap:7px;background:var(--bg);border:1.5px solid var(--cinza-c);border-radius:8px;padding:7px 12px;min-width:220px}
+.sbox input{border:none;background:transparent;font-size:13px;outline:none;flex:1;color:var(--txt)}
+.sbox input::placeholder{color:var(--cinza)}
+.fgrp{display:flex;gap:7px;flex-wrap:wrap}
+select.fil{background:var(--bg);border:1.5px solid var(--cinza-c);border-radius:8px;padding:7px 11px;font-size:13px;color:var(--txt);cursor:pointer;outline:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--azul);color:#fff;position:sticky;top:0}
+thead th{padding:11px 13px;text-align:left;font-weight:600;font-size:12px;letter-spacing:.3px;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--cinza-c);transition:background .12s}
+tbody tr:hover{background:#F8FAFC}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:10px 13px;vertical-align:middle;color:var(--cinza-e)}
+.td-emp{font-weight:600;color:var(--azul)}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.tj{background:#DBEAFE;color:#1D4ED8}.te{background:#D1FAE5;color:#065F46}
+.tb{background:#FEF3C7;color:#92400E}.tp{background:#EDE9FE;color:#5B21B6}
+.vp{color:var(--verde);font-weight:600}
+/* CONTROLE TABLE */
+.ctrl-wrap{background:var(--bco);border-radius:14px;box-shadow:var(--sh);overflow:hidden;border:1px solid rgba(0,0,0,.06);margin-top:18px}
+.ctrl-hdr{background:linear-gradient(90deg,var(--azul),var(--azul-m));color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between}
+.ctrl-hdr h3{font-size:14px;font-weight:700}
+.mes-wrap{overflow-x:auto}
+.mt{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+.mt thead{background:#F1F5F9}
+.mt thead th{padding:9px 11px;text-align:center;font-weight:700;color:var(--azul);border-bottom:1.5px solid var(--cinza-c);white-space:nowrap;font-size:11px;letter-spacing:.3px}
+.mt thead th:first-child{text-align:left}
+.mt tbody td{padding:7px 11px;border-bottom:1px solid var(--cinza-c);text-align:center;color:var(--cinza-e);font-size:12px}
+.mt tbody td:first-child{text-align:left;font-weight:600}
+.mt .sub td{background:#EFF6FF;font-weight:800;color:var(--azul);border-top:1.5px solid var(--azul-c);font-size:12px}
+.mt .gtot td{background:var(--azul);color:#fff;font-weight:800;font-size:12px}
+.mt .emp-lbl td{background:#EFF6FF;font-weight:700;font-size:13px;color:var(--azul);padding:9px 16px}
+.dash{color:#CBD5E1}
+/* PAGINAÇÃO */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-top:1px solid var(--cinza-c);font-size:13px;color:var(--cinza)}
+.pbtns{display:flex;gap:3px}
+.pbtn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--cinza-c);background:#fff;cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pbtn:hover{border-color:var(--azul);color:var(--azul)}
+.pbtn.active{background:var(--azul);color:#fff;border-color:var(--azul)}
+.pbtn:disabled{opacity:.4;cursor:default}
+/* DESC CELL */
+.dc{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+/* CHARTS */
+.dash-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:6px}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr}}
+.ch-card{background:var(--bco);border-radius:14px;box-shadow:var(--sh);padding:20px;border:1px solid rgba(0,0,0,.06)}
+.ch-ttl{font-size:14px;font-weight:700;color:var(--azul);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.bar-chart{display:flex;flex-direction:column;gap:9px}
+.bar-item{display:flex;align-items:center;gap:8px}
+.bar-lbl{font-size:12px;color:var(--cinza);min-width:140px;text-align:right}
+.bar-trk{flex:1;height:22px;background:var(--bg);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;font-size:11px;font-weight:700;color:#fff;transition:width .8s cubic-bezier(.25,.46,.45,.94);min-width:36px}
+.leg{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+.leg-it{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.leg-nm{font-size:12px;color:var(--cinza-e);flex:1}
+.leg-vl{font-size:13px;font-weight:700;color:var(--azul)}
+.leg-pct{font-size:11px;color:var(--cinza);background:var(--bg);padding:2px 7px;border-radius:10px}
+/* BTN */
+.btn{padding:8px 15px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-p{background:var(--azul);color:#fff}.btn-p:hover{background:var(--azul-m)}
+.btn-o{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}.btn-o:hover{background:#EFF6FF}
+.btn-g{background:#059669;color:#fff}.btn-g:hover{background:#047857}
+.btn-r{background:var(--verm);color:#fff}.btn-r:hover{background:#DC2626}
+.btn-sm{padding:5px 11px;font-size:12px}
+/* ══════════════════════════════════
+   MODAL CRD — EDITOR
+══════════════════════════════════ */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.mo.open{display:flex}
+.mo-box{background:#fff;border-radius:16px;width:100%;max-width:1000px;max-height:93vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:fi .2s ease}
+.mo-hdr{background:linear-gradient(90deg,var(--azul),var(--azul-m));color:#fff;padding:18px 24px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mo-hdr h2{font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
+.mo-hdr .meta{font-size:12px;opacity:.8}
+.mo-close{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.mo-close:hover{background:rgba(255,255,255,.3)}
+.mo-body{overflow-y:auto;flex:1;padding:20px 24px}
+/* CRD EDITOR TABLE */
+.crd-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.crd-tbl thead{background:var(--azul)}
+.crd-tbl thead th{padding:10px 12px;color:#fff;font-weight:600;font-size:12px;letter-spacing:.3px;text-align:left;white-space:nowrap}
+.crd-tbl tbody tr{border-bottom:1px solid var(--cinza-c);transition:background .1s}
+.crd-tbl tbody tr:hover{background:#F8FAFC}
+.crd-tbl td{padding:8px 10px;vertical-align:middle}
+.inp{width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:6px 10px;font-size:13px;color:var(--txt);outline:none;transition:border .15s;background:#fff;font-family:inherit}
+.inp:focus{border-color:var(--azul-c);box-shadow:0 0 0 2px rgba(74,143,193,.15)}
+.inp-num{text-align:right}
+select.inp{cursor:pointer}
+.crd-calc{font-weight:700;color:var(--azul);text-align:right;padding:8px 10px;background:#F8FAFC}
+.del-btn{width:28px;height:28px;border:none;background:#FEE2E2;color:var(--verm);border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.del-btn:hover{background:var(--verm);color:#fff}
+/* CRD TOTAL STRIP */
+.crd-totals{background:var(--azul);color:#fff;border-radius:10px;padding:14px 18px;margin:14px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.crd-tot-it{text-align:center}
+.crd-tot-it .lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;opacity:.75}
+.crd-tot-it .val{font-size:16px;font-weight:800;margin-top:3px}
+/* TIPO RATEIO SELECTOR IN EDITOR */
+.tipo-sel{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.tipo-btn{padding:6px 14px;border-radius:20px;border:2px solid var(--cinza-c);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--cinza-e)}
+.tipo-btn.sel-j{border-color:#3B82F6;background:#DBEAFE;color:#1D4ED8}
+.tipo-btn.sel-e{border-color:#10B981;background:#D1FAE5;color:#065F46}
+.tipo-btn.sel-b{border-color:#F59E0B;background:#FEF3C7;color:#92400E}
+.tipo-btn.sel-p{border-color:#8B5CF6;background:#EDE9FE;color:#5B21B6}
+/* MO FOOTER */
+.mo-ft{padding:16px 24px;border-top:1px solid var(--cinza-c);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;background:#F8FAFC;border-radius:0 0 16px 16px}
+/* ALERT TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--cinza-e);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:900;opacity:0;transform:translateY(8px);transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{background:#065F46}.toast.err{background:#7F1D1D}
+/* MODAL SIMPLES */
+.mo2{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;display:none;align-items:center;justify-content:center;padding:16px}
+.mo2.open{display:flex}
+.mo2-box{background:#fff;border-radius:14px;padding:26px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:fi .2s ease}
+.mo2-box h2{font-size:16px;font-weight:700;color:var(--azul);margin-bottom:14px}
+.mo2-body p{font-size:13px;color:var(--cinza-e);margin-bottom:8px;line-height:1.5}
+.mo2-close{margin-top:16px;width:100%;padding:10px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.mo2-close:hover{background:var(--azul-m)}
+.empty{text-align:center;padding:48px 20px;color:var(--cinza)}
+.empty span{font-size:36px;display:block;margin-bottom:10px;opacity:.35}
+@media(max-width:700px){.main{padding:14px}.cards{grid-template-columns:1fr 1fr}.emp-grid{grid-template-columns:1fr}.hdr{padding:12px 14px}}
+
+/* ═══ LOGIN ═══ */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0F172A 0%,#1B3A5C 50%,#0F172A 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.4)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .ic{width:64px;height:64px;background:linear-gradient(135deg,#1B3A5C,#2D5F8A);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.login-logo h1{font-size:22px;font-weight:800;color:#0F172A}
+.login-logo p{font-size:13px;color:#64748B;margin-top:4px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.login-field input{width:100%;border:2px solid #E2E8F0;border-radius:10px;padding:12px 14px;font-size:14px;outline:none;font-family:inherit;transition:border-color .15s}
+.login-field input:focus{border-color:#2D5F8A}
+.login-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(90deg,#1B3A5C,#2D5F8A);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .15s}
+.login-btn:hover{opacity:.9}
+.login-err{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;color:#DC2626;font-size:13px;margin-bottom:14px;display:none}
+.login-footer{text-align:center;margin-top:20px;font-size:12px;color:#94A3B8}
+
+/* ═══ MODAL USUÁRIOS ═══ */
+.mo-users{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;display:none;align-items:center;justify-content:center;padding:14px}
+.mo-users.open{display:flex}
+.mo-users-box{background:#fff;border-radius:16px;width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+.mo-users-hdr{background:linear-gradient(90deg,#1B3A5C,#2D5F8A);border-radius:16px 16px 0 0;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
+.mo-users-hdr h2{color:#fff;font-size:15px;font-weight:700}
+.mo-users-body{overflow-y:auto;padding:20px 24px;flex:1}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #E2E8F0}
+.user-info .u-name{font-size:14px;font-weight:700;color:#0F172A}
+.user-info .u-email{font-size:12px;color:#64748B;margin-top:2px}
+.user-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:#DBEAFE;color:#1D4ED8}
+.user-badge.admin{background:#FEF3C7;color:#92400E}
+.u-actions{display:flex;gap:6px}
+.btn-del-user{padding:5px 10px;border:1.5px solid #EF4444;background:#fff;color:#EF4444;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-del-user:hover{background:#EF4444;color:#fff}
+.add-user-form{background:#F8FAFC;border-radius:10px;padding:16px;border:1px solid #E2E8F0;margin-top:16px}
+.add-user-form h3{font-size:13px;font-weight:700;color:#0F172A;margin-bottom:12px}
+.add-user-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.add-user-grid input{border:1.5px solid #E2E8F0;border-radius:7px;padding:8px 10px;font-size:13px;outline:none;font-family:inherit;width:100%}
+.add-user-grid input:focus{border-color:#2D5F8A}
+.btn-add-user{padding:9px 18px;border:none;background:linear-gradient(90deg,#1B3A5C,#2D5F8A);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+
+/* Header user badge */
+.hdr-user{display:flex;align-items:center;gap:10px}
+.hdr-user-name{font-size:13px;color:#fff;font-weight:600;opacity:.9}
+.btn-logout{padding:6px 12px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-logout:hover{background:rgba(255,255,255,.2)}
+.btn-users{padding:6px 12px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px}
+.btn-users:hover{background:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<!-- ═══ TELA DE LOGIN ═══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="ic">🦅</div>
+      <h1>Controle de Taxas</h1>
+      <p>Grupo Águia — CSC</p>
+    </div>
+    <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input id="loginUser" type="text" placeholder="seu.usuario" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <button class="login-btn" onclick="fazerLogin()">🔐 Entrar</button>
+    <div class="login-footer">Grupo Águia CSC · Sistema Interno</div>
+  </div>
+</div>
+
+<!-- ═══ MODAL GERENCIAR USUÁRIOS ═══ -->
+<div class="mo-users" id="moUsers" onclick="if(event.target.id==='moUsers')fecharUsuarios()">
+  <div class="mo-users-box">
+    <div class="mo-users-hdr">
+      <h2>👥 Gerenciar Usuários</h2>
+      <button class="mo-xml-close" onclick="fecharUsuarios()">✕</button>
+    </div>
+    <div class="mo-users-body">
+      <div id="usersList"></div>
+      <div class="add-user-form">
+        <h3>➕ Adicionar Novo Usuário</h3>
+        <div class="add-user-grid">
+          <input id="novoNome"  placeholder="Nome completo">
+          <input id="novoUser"  placeholder="Usuário (sem espaços)">
+          <input id="novaSenha" type="password" placeholder="Senha">
+          <input id="novaSenha2" type="password" placeholder="Confirmar senha">
+        </div>
+        <button class="btn-add-user" onclick="adicionarUsuario()">➕ Adicionar Usuário</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-ic">🦅</div>
+      <div class="logo-txt">
+        <h1>Controle de Taxas</h1>
+        <p>Grupo Águia — Centro de Serviços Compartilhados</p>
+      </div>
+    </div>
+    <div class="hdr-date" id="hdrDate"></div>
+  <div class="hdr-user">
+    <span class="hdr-user-name" id="hdrUserName"></span>
+    <button class="btn-users" onclick="abrirUsuarios()">👥 Usuários</button>
+    <button class="btn-logout" onclick="fazerLogout()">🚪 Sair</button>
+  </div>
+  </div>
+  <div class="tabs-bar">
+    <div class="tabs-in">
+      <button class="tab active" onclick="showTab('dashboard',this)"><div class="tdot"></div>📊 Dashboard</button>
+      <button class="tab" onclick="showTab('rateio',this)"><div class="tdot"></div>🏢 Rateio por Empresa</button>
+      <button class="tab" onclick="showTab('controle-sad',this)"><div class="tdot"></div>📅 Controle SAD</button>
+      <button class="tab" onclick="showTab('controle-rec',this)"><div class="tdot"></div>📅 Controle REC</button>
+      <button class="tab" onclick="showTab('transacoes',this)"><div class="tdot"></div>💳 Transações</button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+<!-- ═══ DASHBOARD ═══ -->
+<div id="sec-dashboard" class="sec active">
+  <div class="cards" id="dashCards"></div>
+  <div class="dash-grid">
+    <div class="ch-card"><div class="ch-ttl">📊 Rateio Mensal por Empresa</div><div class="bar-chart" id="barChart"></div></div>
+    <div class="ch-card">
+      <div class="ch-ttl">🎯 Distribuição por Tipo</div>
+      <canvas id="pieC" width="180" height="180" style="display:block;margin:0 auto;"></canvas>
+      <div class="leg" id="pieLeg"></div>
+    </div>
+  </div>
+  <div class="ch-card" style="margin-top:18px;"><div class="ch-ttl">📈 Evolução Mensal — Controle SAD</div><canvas id="lineC" width="800" height="140" style="width:100%;height:140px;"></canvas></div>
+</div>
+
+<!-- ═══ RATEIO POR EMPRESA ═══ -->
+<div id="sec-rateio" class="sec">
+  <div class="sec-hdr">
+    <div class="sec-ttl">🏢 Rateio por Empresa <span class="badge">Clique para editar CRDs</span></div>
+    <div style="font-size:12px;color:var(--cinza);">Taxas: TD-509 R$850 · TD-510 R$650 · TD-511 R$1.750 · TD-512 R$275</div>
+  </div>
+  <div class="cards" id="ratSumCards"></div>
+  <div class="emp-grid" id="empGrid"></div>
+</div>
+
+<!-- ═══ CONTROLE SAD ═══ -->
+<div id="sec-controle-sad" class="sec">
+  <div class="sec-hdr"><div class="sec-ttl">📅 Controle SAD <span class="badge">A Pagar</span></div></div>
+  <div class="cards" id="sadCards"></div>
+  <div class="ctrl-wrap">
+    <div class="ctrl-hdr"><h3>💳 Controle de Pagamentos — SAD</h3><span style="font-size:12px;opacity:.8;">2026</span></div>
+    <div class="mes-wrap"><table class="mt" id="sadTbl"></table></div>
+  </div>
+</div>
+
+<!-- ═══ CONTROLE REC ═══ -->
+<div id="sec-controle-rec" class="sec">
+  <div class="sec-hdr"><div class="sec-ttl">📅 Controle REC <span class="badge">A Receber</span></div></div>
+  <div class="cards" id="recCards"></div>
+  <div class="ctrl-wrap">
+    <div class="ctrl-hdr" style="background:linear-gradient(90deg,#065F46,#059669);"><h3>🏦 Controle de Recebimentos — REC</h3><span style="font-size:12px;opacity:.8;">2026</span></div>
+    <div class="mes-wrap"><table class="mt" id="recTbl"></table></div>
+  </div>
+</div>
+
+<!-- ═══ TRANSAÇÕES ═══ -->
+<div id="sec-transacoes" class="sec">
+  <div class="sec-hdr"><div class="sec-ttl">💳 Transações <span class="badge" id="trBadge">0</span></div></div>
+  <div class="cards" id="trCards"></div>
+  <div class="tbl-wrap">
+    <div class="tbl-tb">
+      <div class="sbox"><span>🔍</span><input id="srchIn" type="text" placeholder="Buscar fornecedor, descrição, SAD..." oninput="filterTr()"></div>
+      <div class="fgrp">
+        <select class="fil" id="filRat" onchange="filterTr()">
+          <option value="">Todos os tipos</option>
+          <option value="PESSOAS">Pessoas e Cultura</option>
+          <option value="JURIDICA">Jurídica</option>
+          <option value="BENEFICIOS">Benefícios</option>
+          <option value="ESG">ESG</option>
+        </select>
+        <select class="fil" id="filMes" onchange="filterTr()">
+          <option value="">Todos os meses</option>
+          <option value="202601">Jan 2026</option>
+          <option value="202602">Fev 2026</option>
+          <option value="202603">Mar 2026</option>
+          <option value="202604">Abr 2026</option>
+          <option value="202605">Mai 2026</option>
+        </select>
+        <button class="btn btn-o btn-sm" onclick="clearFil()">✕ Limpar</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Data</th><th>Fornecedor</th><th>Descrição</th><th>Tipo</th><th>Competência</th><th style="text-align:right;">Valor</th><th>SAD</th></tr></thead>
+        <tbody id="trBody"></tbody>
+      </table>
+    </div>
+    <div class="pag"><span id="pgInfo"></span><div class="pbtns" id="pgBtns"></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ MODAL EDITOR CRD ═══ -->
+<div class="mo" id="moCRD" onclick="closeMoCRD(event)">
+  <div class="mo-box">
+    <div class="mo-hdr">
+      <div>
+        <h2 id="moTitle">✏️ Editar CRDs</h2>
+        <div class="meta" id="moMeta"></div>
+      </div>
+      <button class="mo-close" onclick="closeMoCRDBtn()">✕</button>
+    </div>
+    <div class="mo-body">
+
+      <!-- BLOCOS DE TIPO COM SOMATÓRIO -->
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Tipos de Rateio — Clique para filtrar a tabela</div>
+        <div id="tipoCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div>
+      </div>
+
+      <!-- TABELA CRD -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--azul);" id="crdSubtitle">Todos os CRDs</div>
+        <button class="btn btn-o btn-sm" onclick="addCRDRow()">＋ Novo CRD</button>
+      </div>
+      <div style="overflow-x:auto;border-radius:10px;border:1.5px solid var(--cinza-c);">
+        <table class="crd-tbl">
+          <thead>
+            <tr>
+              <th style="width:130px;">Centro de Custo</th>
+              <th style="min-width:180px;">Departamento</th>
+              <th style="width:72px;text-align:center;">Pessoas</th>
+              <th style="width:130px;">Tipo Rateio</th>
+              <th style="width:95px;text-align:right;">Taxa (R$)</th>
+              <th style="width:115px;text-align:right;">Total Mensal</th>
+              <th style="width:34px;"></th>
+            </tr>
+          </thead>
+          <tbody id="crdTbody"></tbody>
+          <tfoot>
+            <tr id="crdFooter" style="background:#EFF6FF;">
+              <td colspan="2" style="padding:9px 12px;font-weight:700;font-size:12px;color:var(--azul);">TOTAL</td>
+              <td id="ftPessoas" style="text-align:center;font-weight:800;color:var(--azul);padding:9px 12px;font-size:13px;"></td>
+              <td></td><td></td>
+              <td id="ftTotal" style="text-align:right;font-weight:800;color:var(--azul);padding:9px 12px;font-size:13px;"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-o" onclick="closeMoCRDBtn()">Cancelar</button>
+      <button class="btn btn-g" onclick="saveCRD()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL GERAR SAD / REC — COMPETÊNCIAS E VENCIMENTOS ═══ -->
+<div class="mo-xml" id="moGerarDoc" onclick="fecharModalGerarDoc(event)">
+  <div class="mo-xml-box" style="max-width:640px;">
+    <div class="mo-xml-hdr" id="moGerarHdr" style="background:linear-gradient(135deg,#1B3A5C,#2D5F8A);">
+      <div>
+        <h2 id="moGerarTitle">📅 Competências e Vencimentos</h2>
+        <div class="sub" id="moGerarSub">Preencha as competências e vencimentos. Deixe em branco as que não usar.</div>
+      </div>
+      <button class="mo-xml-close" onclick="document.getElementById('moGerarDoc').classList.remove('open')">✕</button>
+    </div>
+    <div class="mo-xml-body" style="padding:24px;">
+
+      <!-- CONFIG WSGA (colapsável) -->
+      <div style="margin-bottom:16px;">
+        <button onclick="toggleCfgWsga()" style="background:none;border:1.5px solid var(--cinza-c);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--cinza);cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;">
+          ⚙️ Configurações WSGA <span id="cfgWsgaArrow" style="margin-left:auto;">▼</span>
+        </button>
+        <div id="cfgWsgaPanel" style="display:none;margin-top:10px;background:#F8FAFC;border-radius:10px;padding:14px;border:1px solid var(--cinza-c);display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;display:block;margin-bottom:4px;">URL do WebService</label>
+              <input id="wsgaUrl" value="http://aguiaweb/WSGA/awsgaservice.aspx" style="width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;display:block;margin-bottom:4px;">Session ID</label>
+              <input id="wsgaSession" value="4319DB1C671EBFCCFE0E" style="width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;display:block;margin-bottom:4px;">Ukey Origem (Fornecedor/Cliente)</label>
+              <input id="wsgaUkey" value="WSGA_6EFF_450E1514AD" style="width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;display:block;margin-bottom:4px;">Tipo Documento</label>
+              <input id="wsgaTipoDoc" value="TD-0000081" style="width:100%;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABELA COMPETÊNCIAS E VENCIMENTOS -->
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--cinza-c);">
+            <th style="padding:10px 8px;text-align:center;font-size:12px;font-weight:700;color:var(--cinza);width:36px;">#</th>
+            <th style="padding:10px 8px;text-align:left;font-size:12px;font-weight:700;color:#F59E0B;">Competência (MM/AAAA)</th>
+            <th style="padding:10px 8px;text-align:left;font-size:12px;font-weight:700;color:#F59E0B;">Vencimento (DD/MM/AAAA)</th>
+          </tr>
+        </thead>
+        <tbody id="competenciasBody"></tbody>
+      </table>
+
+      <!-- RESUMO -->
+      <div id="gerarResumo" style="background:#EFF6FF;border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--azul);display:none;">
+        <strong id="gerarResumoTxt"></strong>
+      </div>
+
+      <!-- LOG DE RESULTADOS -->
+      <div id="gerarLog" style="display:none;background:#0F172A;border-radius:10px;padding:14px;max-height:220px;overflow-y:auto;margin-bottom:16px;">
+        <div id="gerarLogContent" style="font-family:monospace;font-size:12px;line-height:1.7;color:#E2E8F0;"></div>
+      </div>
+
+      <!-- BOTÕES -->
+      <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="document.getElementById('moGerarDoc').classList.remove('open')"
+          style="padding:10px 22px;border-radius:9px;border:1.5px solid var(--verm);background:#fff;color:var(--verm);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
+          ✕ Cancelar
+        </button>
+        <button id="btnGerarExecutar" onclick="executarGerarDocs()"
+          style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(90deg,#059669,#10B981);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(5,150,105,.3);">
+          🚀 <span id="btnGerarLabel">GERAR SADs no StarSoft</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE TRANSAÇÃO -->
+<div class="mo2" id="mo2" onclick="closeMo2(event)">
+  <div class="mo2-box">
+    <h2>💳 Detalhe da Transação</h2>
+    <div class="mo2-body" id="mo2body"></div>
+    <button class="mo2-close" onclick="document.getElementById('mo2').classList.remove('open')">Fechar</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DADOS BASE
+// ═══════════════════════════════════════
+const TAXAS = { '509':850, '510':650, '511':1750, '512':275 };
+
+// Dados de CRD por empresa — fiéis à planilha CONTROLE_DAS_TAXAS
+// Cada empresa tem os 4 tipos de rateio (510 Jurídica, 512 ESG, 511 Benefícios, 509 Pessoas)
+// Pessoas e taxa por tipo conforme aba "Rateio por Empresa"
+let EMPRESAS = [
+
+  // ── 02 PALLAS ── 70-71 pessoas ─────────────────────────────────────────
+  { cod:'02', nome:'Pallas', icon:'✈️', crds:[
+    // Jurídica (510) — 70 pessoas × R$650 = R$45.500 (base jan-abr; mai+ = 71p = R$46.150)
+    {crd:'02.203.0068',dept:'CHAIRMAN',                                                              pessoas:2,  tipo:'510', taxa:650},
+    {crd:'02.203.0075',dept:'ADMINISTRATIVOS COMPETIÇÕES',                                           pessoas:4,  tipo:'510', taxa:650},
+    {crd:'02.203.0080',dept:'DIR. ÁREA ADM FINANCEIRO, CONTÁBIL E FP&A',                            pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0081',dept:'SEÇÃO CONTABILIDADE',                                                   pessoas:2,  tipo:'510', taxa:650},
+    {crd:'02.203.0082',dept:'SETOR FATURAMENTO',                                                     pessoas:7,  tipo:'510', taxa:650},
+    {crd:'02.203.0083',dept:'SETOR FLUXO DE CAIXA',                                                 pessoas:4,  tipo:'510', taxa:650},
+    {crd:'02.203.0084',dept:'SETOR JURÍDICO',                                                        pessoas:2,  tipo:'510', taxa:650},
+    {crd:'02.203.0085',dept:'SEÇÃO DP',                                                              pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0086',dept:'SEÇÃO TI',                                                              pessoas:2,  tipo:'510', taxa:650},
+    {crd:'02.203.0087',dept:'SETOR DHO',                                                             pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0089',dept:'COMUNICAÇÃO',                                                           pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0091',dept:'SETOR FP&A',                                                            pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0092',dept:'SETOR ADMINISTRATIVO',                                                  pessoas:2,  tipo:'510', taxa:650},
+    {crd:'02.203.0093',dept:'SETOR ATEND. E OPER. AÉREAS',                                          pessoas:13, tipo:'510', taxa:650},
+    {crd:'02.203.0094',dept:'SETOR ATEND. E OPER. ACOMODAÇÃO E ALIMENTAÇÃO',                        pessoas:12, tipo:'510', taxa:650},
+    {crd:'02.203.0095',dept:'SETOR ATEND. E OPER. RODOVIÁRIO',                                      pessoas:8,  tipo:'510', taxa:650},
+    {crd:'02.203.0096',dept:'SETOR CENTRO DE CONTROLE DE OPERAÇÕES',                                pessoas:6,  tipo:'510', taxa:650},
+    {crd:'02.203.0097',dept:'DIR. ÁREA ATEND. & OPER. TURÍSTICAS',                                  pessoas:1,  tipo:'510', taxa:650},
+    {crd:'02.203.0068',dept:'COLABORADORES',                                                         pessoas:1,  tipo:'510', taxa:650},
+    // ESG (512) — 71 pessoas × R$275 = R$19.525 (mai+) / R$19.250 (jan-abr base)
+    {crd:'02.203.0068',dept:'CHAIRMAN',                                                              pessoas:2,  tipo:'512', taxa:275},
+    {crd:'02.203.0075',dept:'ADMINISTRATIVOS COMPETIÇÕES',                                           pessoas:4,  tipo:'512', taxa:275},
+    {crd:'02.203.0080',dept:'DIR. ÁREA ADM FINANCEIRO, CONTÁBIL E FP&A',                            pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0081',dept:'SEÇÃO CONTABILIDADE',                                                   pessoas:2,  tipo:'512', taxa:275},
+    {crd:'02.203.0082',dept:'SETOR FATURAMENTO',                                                     pessoas:7,  tipo:'512', taxa:275},
+    {crd:'02.203.0083',dept:'SETOR FLUXO DE CAIXA',                                                 pessoas:4,  tipo:'512', taxa:275},
+    {crd:'02.203.0084',dept:'SETOR JURÍDICO',                                                        pessoas:2,  tipo:'512', taxa:275},
+    {crd:'02.203.0085',dept:'SEÇÃO DP',                                                              pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0086',dept:'SEÇÃO TI',                                                              pessoas:2,  tipo:'512', taxa:275},
+    {crd:'02.203.0087',dept:'SETOR DHO',                                                             pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0089',dept:'COMUNICAÇÃO',                                                           pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0091',dept:'SETOR FP&A',                                                            pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0092',dept:'SETOR ADMINISTRATIVO',                                                  pessoas:2,  tipo:'512', taxa:275},
+    {crd:'02.203.0093',dept:'SETOR ATEND. E OPER. AÉREAS',                                          pessoas:13, tipo:'512', taxa:275},
+    {crd:'02.203.0094',dept:'SETOR ATEND. E OPER. ACOMODAÇÃO E ALIMENTAÇÃO',                        pessoas:12, tipo:'512', taxa:275},
+    {crd:'02.203.0095',dept:'SETOR ATEND. E OPER. RODOVIÁRIO',                                      pessoas:8,  tipo:'512', taxa:275},
+    {crd:'02.203.0096',dept:'SETOR CENTRO DE CONTROLE DE OPERAÇÕES',                                pessoas:6,  tipo:'512', taxa:275},
+    {crd:'02.203.0097',dept:'DIR. ÁREA ATEND. & OPER. TURÍSTICAS',                                  pessoas:1,  tipo:'512', taxa:275},
+    {crd:'02.203.0068',dept:'COLABORADORES',                                                         pessoas:1,  tipo:'512', taxa:275},
+    // Benefícios (511) — 70 pessoas × R$202,32 = R$14.162,40
+    {crd:'022050001',dept:'BENEFÍCIOS CLT PALLAS',                                                 pessoas:70, tipo:'511', taxa:202.32},
+    // Pessoas e Cultura (509) — 70 pessoas × R$850 = R$59.500
+    {crd:'022010001',dept:'COLABORADORES PALLAS',                                                  pessoas:70, tipo:'509', taxa:850},
+  ]},
+
+  // ── 18 CSC ── 22 pessoas ────────────────────────────────────────────────
+  { cod:'18', nome:'CSC', icon:'🏢', crds:[
+    // Jurídica (510) — 22p × R$650 = R$14.300
+    {crd:'18.203.0003',dept:'CEO',                                           pessoas:2,  tipo:'510', taxa:650},
+    {crd:'18.203.0005',dept:'CONTROLADORIA',                                 pessoas:2,  tipo:'510', taxa:650},
+    {crd:'18.203.0006',dept:'FATURAMENTO',                                   pessoas:4,  tipo:'510', taxa:650},
+    {crd:'18.203.0007',dept:'FINANCEIRO',                                    pessoas:4,  tipo:'510', taxa:650},
+    {crd:'18.203.0009',dept:'JURÍDICO',                                      pessoas:1,  tipo:'510', taxa:650},
+    {crd:'18.203.0010',dept:'DP',                                            pessoas:1,  tipo:'510', taxa:650},
+    {crd:'18.203.0012',dept:'ENDO MKT',                                      pessoas:1,  tipo:'510', taxa:650},
+    {crd:'18.203.0013',dept:'TI',                                            pessoas:1,  tipo:'510', taxa:650},
+    {crd:'18.203.0016',dept:'DHO',                                           pessoas:2,  tipo:'510', taxa:650},
+    {crd:'18.203.0017',dept:'PLANEJAMENTOS E PROJETOS',                      pessoas:1,  tipo:'510', taxa:650},
+    {crd:'18.203.0022',dept:'DIRETORIA ADM',                                 pessoas:2,  tipo:'510', taxa:650},
+    {crd:'18.203.0022',dept:'DIRETORIA DE OPERAÇÕES ESTRATÉGICAS',           pessoas:1,  tipo:'510', taxa:650},
+    // ESG (512) — 22p × R$275 = R$6.050
+    {crd:'18.203.0003',dept:'CEO',                                           pessoas:2,  tipo:'512', taxa:275},
+    {crd:'18.203.0005',dept:'CONTROLADORIA',                                 pessoas:2,  tipo:'512', taxa:275},
+    {crd:'18.203.0006',dept:'FATURAMENTO',                                   pessoas:4,  tipo:'512', taxa:275},
+    {crd:'18.203.0007',dept:'FINANCEIRO',                                    pessoas:4,  tipo:'512', taxa:275},
+    {crd:'18.203.0009',dept:'JURÍDICO',                                      pessoas:1,  tipo:'512', taxa:275},
+    {crd:'18.203.0010',dept:'DP',                                            pessoas:1,  tipo:'512', taxa:275},
+    {crd:'18.203.0012',dept:'ENDO MKT',                                      pessoas:1,  tipo:'512', taxa:275},
+    {crd:'18.203.0013',dept:'TI',                                            pessoas:1,  tipo:'512', taxa:275},
+    {crd:'18.203.0016',dept:'DHO',                                           pessoas:2,  tipo:'512', taxa:275},
+    {crd:'18.203.0017',dept:'PLANEJAMENTOS E PROJETOS',                      pessoas:1,  tipo:'512', taxa:275},
+    {crd:'18.203.0022',dept:'DIRETORIA ADM',                                 pessoas:2,  tipo:'512', taxa:275},
+    {crd:'18.203.0022',dept:'DIRETORIA DE OPERAÇÕES ESTRATÉGICAS',           pessoas:1,  tipo:'512', taxa:275},
+    // Benefícios (511) — 22p × R$1.750 = R$38.500
+    {crd:'18.203.0003',dept:'CEO',                                           pessoas:2,  tipo:'511', taxa:1750},
+    {crd:'18.203.0005',dept:'CONTROLADORIA',                                 pessoas:2,  tipo:'511', taxa:1750},
+    {crd:'18.203.0006',dept:'FATURAMENTO',                                   pessoas:4,  tipo:'511', taxa:1750},
+    {crd:'18.203.0007',dept:'FINANCEIRO',                                    pessoas:4,  tipo:'511', taxa:1750},
+    {crd:'18.203.0009',dept:'JURÍDICO',                                      pessoas:1,  tipo:'511', taxa:1750},
+    {crd:'18.203.0010',dept:'DP',                                            pessoas:1,  tipo:'511', taxa:1750},
+    {crd:'18.203.0012',dept:'ENDO MKT',                                      pessoas:1,  tipo:'511', taxa:1750},
+    {crd:'18.203.0013',dept:'TI',                                            pessoas:1,  tipo:'511', taxa:1750},
+    {crd:'18.203.0016',dept:'DHO',                                           pessoas:2,  tipo:'511', taxa:1750},
+    {crd:'18.203.0017',dept:'PLANEJAMENTOS E PROJETOS',                      pessoas:1,  tipo:'511', taxa:1750},
+    {crd:'18.203.0022',dept:'DIRETORIA ADM',                                 pessoas:2,  tipo:'511', taxa:1750},
+    {crd:'18.203.0022',dept:'DIRETORIA DE OPERAÇÕES ESTRATÉGICAS',           pessoas:1,  tipo:'511', taxa:1750},
+    // Pessoas e Cultura (509) — 22p × R$850 = R$18.700
+    {crd:'18.203.0003',dept:'CEO',                                           pessoas:2,  tipo:'509', taxa:850},
+    {crd:'18.203.0005',dept:'CONTROLADORIA',                                 pessoas:2,  tipo:'509', taxa:850},
+    {crd:'18.203.0006',dept:'FATURAMENTO',                                   pessoas:4,  tipo:'509', taxa:850},
+    {crd:'18.203.0007',dept:'FINANCEIRO',                                    pessoas:4,  tipo:'509', taxa:850},
+    {crd:'18.203.0009',dept:'JURÍDICO',                                      pessoas:1,  tipo:'509', taxa:850},
+    {crd:'18.203.0010',dept:'DP',                                            pessoas:1,  tipo:'509', taxa:850},
+    {crd:'18.203.0012',dept:'ENDO MKT',                                      pessoas:1,  tipo:'509', taxa:850},
+    {crd:'18.203.0013',dept:'TI',                                            pessoas:1,  tipo:'509', taxa:850},
+    {crd:'18.203.0016',dept:'DHO',                                           pessoas:2,  tipo:'509', taxa:850},
+    {crd:'18.203.0017',dept:'PLANEJAMENTOS E PROJETOS',                      pessoas:1,  tipo:'509', taxa:850},
+    {crd:'18.203.0022',dept:'DIRETORIA ADM',                                 pessoas:2,  tipo:'509', taxa:850},
+    {crd:'18.203.0022',dept:'DIRETORIA DE OPERAÇÕES ESTRATÉGICAS',           pessoas:1,  tipo:'509', taxa:850},
+  ]},
+
+  // ── 26 ASSETUR ── 6 pessoas ─────────────────────────────────────────────
+  { cod:'26', nome:'Assetur', icon:'🏖️', crds:[
+    {crd:'26.305.0001',dept:'DESPESAS ADMINISTRATIVAS - FARIA LIMA', pessoas:6, tipo:'510', taxa:650},
+    {crd:'26.305.0001',dept:'DESPESAS ADMINISTRATIVAS - FARIA LIMA', pessoas:6, tipo:'512', taxa:275},
+    {crd:'26.305.0001',dept:'DESPESAS ADMINISTRATIVAS - FARIA LIMA', pessoas:6, tipo:'511', taxa:202.32},
+    {crd:'26.305.0001',dept:'DESPESAS ADMINISTRATIVAS - FARIA LIMA', pessoas:6, tipo:'509', taxa:850},
+  ]},
+
+  // ── 49 INTERNACIONAL ── base 1 pessoa (jan/2026 teve 14p por entrada de 13) ───
+  { cod:'49', nome:'Internacional', icon:'🌐', crds:[
+    {crd:'49.204.0004',dept:'PROJETO ALTUS', pessoas:1, tipo:'510', taxa:650},
+    {crd:'49.204.0004',dept:'PROJETO ALTUS', pessoas:1, tipo:'512', taxa:275},
+    {crd:'49.204.0004',dept:'PROJETO ALTUS', pessoas:1, tipo:'511', taxa:202.32},
+    {crd:'49.204.0004',dept:'PROJETO ALTUS', pessoas:1, tipo:'509', taxa:850},
+  ]},
+
+  // ── 85 NESTT ── 13 pessoas ──────────────────────────────────────────────
+  { cod:'85', nome:'Nestt / GA Int.', icon:'🌍', crds:[
+    {crd:'85.102.0001',dept:'OPERACIONAL', pessoas:13, tipo:'510', taxa:650},
+    {crd:'85.102.0001',dept:'OPERACIONAL', pessoas:13, tipo:'512', taxa:275},
+    {crd:'85.102.0001',dept:'OPERACIONAL', pessoas:13, tipo:'511', taxa:202.32},
+    {crd:'85.102.0001',dept:'OPERACIONAL', pessoas:13, tipo:'509', taxa:850},
+  ]},
+
+  // ── 69 PRESC FILIAL ── 32 pessoas ───────────────────────────────────────
+  { cod:'69', nome:'Presc Filial', icon:'⚽', crds:[
+    // Jurídica (510) — 32p × R$650 = R$20.800
+    {crd:'69.211.0008',dept:'CBF',            pessoas:31, tipo:'510', taxa:650},
+    {crd:'69.211.0012',dept:'NÚCLEO OLÍMPICO',pessoas:1,  tipo:'510', taxa:650},
+    // ESG (512) — 32p × R$275 = R$8.800
+    {crd:'69.211.0008',dept:'CBF',            pessoas:31, tipo:'512', taxa:275},
+    {crd:'69.211.0012',dept:'NÚCLEO OLÍMPICO',pessoas:1,  tipo:'512', taxa:275},
+    // Benefícios (511) — 32p × R$202,32 = R$6.474,24
+    {crd:'69.211.0008',dept:'CBF',            pessoas:31, tipo:'511', taxa:202.32},
+    {crd:'69.211.0012',dept:'NÚCLEO OLÍMPICO',pessoas:1,  tipo:'511', taxa:202.32},
+    // Pessoas (509) — 32p × R$850 = R$27.200
+    {crd:'69.211.0008',dept:'CBF',            pessoas:31, tipo:'509', taxa:850},
+    {crd:'69.211.0012',dept:'NÚCLEO OLÍMPICO',pessoas:1,  tipo:'509', taxa:850},
+  ]},
+
+  // ── 71 VILA SACRA / GA INT ── 1 pessoa ──────────────────────────────────
+  { cod:'71', nome:'Vila Sacra / GA Int', icon:'🏛️', crds:[
+    {crd:'71.001.0001',dept:'ADMINISTRAÇÃO GERAL', pessoas:1, tipo:'510', taxa:650},
+    {crd:'71.001.0001',dept:'ADMINISTRAÇÃO GERAL', pessoas:1, tipo:'512', taxa:275},
+    {crd:'71.001.0001',dept:'ADMINISTRAÇÃO GERAL', pessoas:1, tipo:'511', taxa:202.32},
+    {crd:'71.001.0001',dept:'ADMINISTRAÇÃO GERAL', pessoas:1, tipo:'509', taxa:850},
+  ]},
+
+  // ── 81 SEDE MHS ── 9 pessoas ─────────────────────────────────────────────
+  { cod:'81', nome:'Sede MHS', icon:'🏠', crds:[
+    // Jurídica (510) — 9p × R$650 = R$5.850
+    {crd:'81.203.0001',dept:'ADMINISTRAÇÃO MHS', pessoas:4, tipo:'510', taxa:650},
+    {crd:'81.203.0002',dept:'FINANCEIRO MHS',    pessoas:3, tipo:'510', taxa:650},
+    {crd:'81.203.0003',dept:'DHO MHS',           pessoas:2, tipo:'510', taxa:650},
+    // ESG (512) — 9p × R$275 = R$2.475
+    {crd:'81.203.0001',dept:'ADMINISTRAÇÃO MHS', pessoas:4, tipo:'512', taxa:275},
+    {crd:'81.203.0002',dept:'FINANCEIRO MHS',    pessoas:3, tipo:'512', taxa:275},
+    {crd:'81.203.0003',dept:'DHO MHS',           pessoas:2, tipo:'512', taxa:275},
+    // Benefícios (511) — 9p × R$202,32 = R$1.820,88
+    {crd:'81.203.0001',dept:'ADMINISTRAÇÃO MHS', pessoas:4, tipo:'511', taxa:202.32},
+    {crd:'81.203.0002',dept:'FINANCEIRO MHS',    pessoas:3, tipo:'511', taxa:202.32},
+    {crd:'81.203.0003',dept:'DHO MHS',           pessoas:2, tipo:'511', taxa:202.32},
+    // Pessoas (509) — 9p × R$850 = R$7.650
+    {crd:'81.203.0001',dept:'ADMINISTRAÇÃO MHS', pessoas:4, tipo:'509', taxa:850},
+    {crd:'81.203.0002',dept:'FINANCEIRO MHS',    pessoas:3, tipo:'509', taxa:850},
+    {crd:'81.203.0003',dept:'DHO MHS',           pessoas:2, tipo:'509', taxa:850},
+  ]},
+
+  // ── 82 TORCIDA BRASIL ── 2 pessoas ──────────────────────────────────────
+  { cod:'82', nome:'Torcida Brasil', icon:'🎪', crds:[
+    {crd:'82.203.0001',dept:'COPA DO MUNDO 2026 – TORCIDA BRASIL - ADM', pessoas:2, tipo:'510', taxa:650},
+    {crd:'82.203.0001',dept:'COPA DO MUNDO 2026 – TORCIDA BRASIL - ADM', pessoas:2, tipo:'512', taxa:275},
+    {crd:'82.203.0001',dept:'COPA DO MUNDO 2026 – TORCIDA BRASIL - ADM', pessoas:2, tipo:'511', taxa:202.32},
+    {crd:'82.203.0001',dept:'COPA DO MUNDO 2026 – TORCIDA BRASIL - ADM', pessoas:2, tipo:'509', taxa:850},
+  ]},
+
+  // ── 84 POP TUR ── 6 pessoas ──────────────────────────────────────────────
+  { cod:'84', nome:'Pop Tur', icon:'🎭', crds:[
+    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'510', taxa:650},
+    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'512', taxa:275},
+    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'511', taxa:202.32},
+    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'509', taxa:850},
+  ]},
+];
+
+const TIPO_INFO = {
+  '509':{label:'Pessoas e Cultura',cls:'sel-p',tagcls:'tp',dotcls:'dp'},
+  '510':{label:'Jurídica e Infr.',cls:'sel-j',tagcls:'tj',dotcls:'dj'},
+  '511':{label:'Benefícios',cls:'sel-b',tagcls:'tb',dotcls:'db'},
+  '512':{label:'ESG',cls:'sel-e',tagcls:'te',dotcls:'de'},
+};
+
+const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+
+// Dados de controle mensal SAD/REC
+const SAD_DATA = {
+  '02 Pallas':   {juridica:[45500,45500,45500,45500,46150,46150,'-','-','-','-','-','-'],esg:[19250,19250,19250,19250,19525,19525,'-','-','-','-','-','-'],beneficios:[14162.4,14162.4,14162.4,14162.4,14364.72,14364.72,'-','-','-','-','-','-'],pessoas:[59500,59500,59500,59500,60350,60350,'-','-','-','-','-','-']},
+  '18 CSC':      {juridica:[13000,13000,13000,13000,14300,14300,'-','-','-','-','-','-'],esg:[5500,5500,5500,5500,6050,6050,'-','-','-','-','-','-'],beneficios:[35000,35000,35000,35000,38500,38500,'-','-','-','-','-','-'],pessoas:[17000,17000,17000,17000,18700,18700,'-','-','-','-','-','-']},
+  '26 Assetur':  {juridica:[3900,3900,3900,3900,3900,3900,'-','-','-','-','-','-'],esg:[1650,1650,1650,1650,1650,1650,'-','-','-','-','-','-'],beneficios:[1213.92,1213.92,1213.92,1213.92,1213.92,1213.92,'-','-','-','-','-','-'],pessoas:[5100,5100,5100,5100,5100,5100,'-','-','-','-','-','-']},
+  '49 Internacional':{juridica:[9100,650,650,650,650,650,'-','-','-','-','-','-'],esg:[3850,275,275,275,275,275,'-','-','-','-','-','-'],beneficios:[2832.48,202.32,202.32,202.32,202.32,202.32,'-','-','-','-','-','-'],pessoas:[11900,850,850,850,850,850,'-','-','-','-','-','-']},
+  '85 Nestt':    {juridica:[null,8450,8450,8450,8450,8450,'-','-','-','-','-','-'],esg:[null,3575,3575,3575,3575,3575,'-','-','-','-','-','-'],beneficios:[null,2630.16,2630.16,2630.16,2630.16,2630.16,'-','-','-','-','-','-'],pessoas:[null,11050,11050,11050,11050,11050,'-','-','-','-','-','-']},
+  '69 Presc Filial':{juridica:[22100,22100,22100,20800,20800,20800,'-','-','-','-','-','-'],esg:[9350,9350,9350,8800,8800,8800,'-','-','-','-','-','-'],beneficios:[6878.88,6878.88,6878.88,6474.24,6474.24,6474.24,'-','-','-','-','-','-'],pessoas:[28900,28900,28900,27200,27200,27200,'-','-','-','-','-','-']},
+  '71 Vila Sacra':{juridica:[650,650,650,null,null,null,'-','-','-','-','-','-'],esg:[275,275,275,null,null,null,'-','-','-','-','-','-'],beneficios:[202.32,202.32,202.32,null,null,null,'-','-','-','-','-','-'],pessoas:[850,850,850,null,null,null,'-','-','-','-','-','-']},
+  '81 Sede MHS': {juridica:[5850,5850,5850,5850,5850,5850,'-','-','-','-','-','-'],esg:[2475,2475,2475,2475,2475,2475,'-','-','-','-','-','-'],beneficios:[1820.88,1820.88,1820.88,1820.88,1820.88,1820.88,'-','-','-','-','-','-'],pessoas:[7650,7650,7650,7650,7650,7650,'-','-','-','-','-','-']},
+  '82 Torcida Brasil':{juridica:[1300,1300,1300,1300,1300,1300,'-','-','-','-','-','-'],esg:[550,550,550,550,550,550,'-','-','-','-','-','-'],beneficios:[404.64,404.64,404.64,404.64,404.64,404.64,'-','-','-','-','-','-'],pessoas:[1700,1700,1700,1700,1700,1700,'-','-','-','-','-','-']},
+  '84 Pop Tur':  {juridica:[3900,3900,3900,3900,3900,3900,null,null,null,null,null,null],esg:[1650,1650,1650,1650,1650,1650,null,null,null,null,null,null],beneficios:[1213.92,1213.92,1213.92,1213.92,1213.92,1213.92,null,null,null,null,null,null],pessoas:[5100,5100,5100,5100,5100,5100,null,null,null,null,null,null]},
+};
+const REC_DATA = JSON.parse(JSON.stringify(SAD_DATA));
+REC_DATA['18 CSC'].beneficios = [4046.4,35000,65953.6,35000,38500,38500,'-','-','-','-','-','-'];
+
+// TRANSAÇÕES
+const TRANSACOES = [
+  {data:'20260123',forn:'PRESC VIAGENS E TURISMO LTDA',desc:'Aéreo palestrante Kick Off',rat:'PESSOAS',comp:'202601',val:804.24,sad:'SAD-202600001382'},
+  {data:'20260127',forn:'REBECA GUIMARAES GOMES',desc:'Reembolso almoço 19/01/2026',rat:'BENEFICIOS',comp:'202601',val:55.8,sad:'SAD-202600001589'},
+  {data:'20260127',forn:'MANAGEFY TECNOLOGIA E SERVICOS',desc:'CSC VR 02 2026 - PJ',rat:'BENEFICIOS',comp:'202601',val:793.25,sad:'SAD-202600001769'},
+  {data:'20260130',forn:'AGT DO BRASIL SERVICOS DE COMUNICACAO',desc:'Telefonia (21) 2430-1100',rat:'JURIDICA',comp:'202601',val:1248,sad:'SAD-202600001667'},
+  {data:'20260130',forn:'BANCO RENDIMENTO S/A',desc:'Compra de carregadores para notebook',rat:'PESSOAS',comp:'202601',val:310,sad:'SAD-202600002204'},
+  {data:'20260203',forn:'ADM CENTRAL',desc:'Rateio Área Jurídica e de Infraestrutura Corporativa 1/12',rat:'JURIDICA',comp:'202601',val:13000,sad:'SAD-202600001984'},
+  {data:'20260203',forn:'FARROCO ABREU GUARNIERI E ZOTELLI ADV.',desc:'Honorários de partido mensal',rat:'JURIDICA',comp:'202601',val:4450.53,sad:'SAD-202600001986'},
+  {data:'20260203',forn:'ADM CENTRAL',desc:'Rateio ESG 1/12',rat:'ESG',comp:'202601',val:5500,sad:'SAD-202600002075'},
+  {data:'20260203',forn:'ADM CENTRAL',desc:'Rateio Benefícios e Complementos 01/12',rat:'BENEFICIOS',comp:'202601',val:4046.4,sad:'SAD-202600002078'},
+  {data:'20260203',forn:'ADM CENTRAL',desc:'Rateio Área de Pessoas e Cultura 01/12',rat:'PESSOAS',comp:'202601',val:17000,sad:'SAD-202600002081'},
+  {data:'20260203',forn:'KIT LANCHE LTDA',desc:'Kit lanche colaboradores SP - Kick Off',rat:'PESSOAS',comp:'202601',val:588.30,sad:'SAD-202600002258'},
+  {data:'20260203',forn:'STARSOFT SISTEMAS CORPORATIVOS LTDA',desc:'Manutenção de software sistema SSA',rat:'JURIDICA',comp:'202601',val:13250.03,sad:'SAD-202600001282'},
+  {data:'20260203',forn:'CAIXA PALLAS',desc:'Reembolso plano de saúde - CSC Janeiro (CLT)',rat:'BENEFICIOS',comp:'202602',val:700,sad:'SAD-202600002239'},
+  {data:'20260203',forn:'INGRAM MICRO BRASIL LTDA',desc:'Licenças Microsoft 365 (lote)',rat:'JURIDICA',comp:'202601',val:12235.35,sad:'SAD-202600002245'},
+  {data:'20260203',forn:'MANAGEFY TECNOLOGIA E SERVICOS',desc:'Reembolso saúde 02/2026',rat:'BENEFICIOS',comp:'202602',val:13421.2,sad:'SAD-202600002286'},
+  {data:'20260206',forn:'GABRIEL SALDANHA SOC. INDIVIDUAL DE ADVOCACIA',desc:'Honorários advocacia Fevereiro 2026',rat:'JURIDICA',comp:'202601',val:2350.72,sad:'SAD-202600002467'},
+  {data:'20260206',forn:'MARTINS NETO E WOLFF SOC. DE ADVOGADOS',desc:'Honorários advocacia de partido',rat:'JURIDICA',comp:'202603',val:4400,sad:'SAD-202600002501'},
+  {data:'20260206',forn:'VIEIRA DE CASTRO MANSUR & FAVER ADVOGADOS',desc:'Honorários de partido mensal',rat:'JURIDICA',comp:'202601',val:5631,sad:'SAD-202600002657'},
+  {data:'20260206',forn:'PELLIZZON JACON ADVOGADOS',desc:'Honorários de partido mensal',rat:'JURIDICA',comp:'202602',val:4000,sad:'SAD-202600002734'},
+  {data:'20260206',forn:'ADM CENTRAL',desc:'Rateio Área de Pessoas e Cultura 02-04/12',rat:'PESSOAS',comp:'202602',val:17000,sad:'SAD-202600002510'},
+  {data:'20260206',forn:'ADM CENTRAL',desc:'Rateio ESG 2-4/12',rat:'ESG',comp:'202602',val:5500,sad:'SAD-202600002676'},
+  {data:'20260206',forn:'ADM CENTRAL',desc:'Rateio Benefícios e Complementos 03-04/12',rat:'BENEFICIOS',comp:'202603',val:35000,sad:'SAD-202600002683'},
+  {data:'20260212',forn:'CENTRO DE CULTURA ESPANOLA LTDA',desc:'Pagamento Curso Espanhol Fev26',rat:'PESSOAS',comp:'202602',val:4460,sad:'SAD-202600003150'},
+  {data:'20260220',forn:'OMINT SEGUROS S.A',desc:'Pagamento Omint Fevereiro 26',rat:'BENEFICIOS',comp:'202602',val:6031.17,sad:'SAD-202600003299'},
+  {data:'20260220',forn:'DOCUSIGN BRASIL SOLUCOES EM TECNOLOGIA',desc:'eSignature Business Pro — Fev/2026',rat:'JURIDICA',comp:'202602',val:1605.32,sad:'SAD-202600003300'},
+  {data:'20260220',forn:'IRON MOUNTAIN DO BRASIL LTDA',desc:'Guarda externa de documentos — Jan-Fev/26',rat:'JURIDICA',comp:'202602',val:5624.45,sad:'SAD-202600003502'},
+  {data:'20260224',forn:'MEMORI S.A',desc:'Pagamento Memori — Fevereiro 2026',rat:'BENEFICIOS',comp:'202602',val:9164.70,sad:'SAD-202600003010'},
+  {data:'20260224',forn:'DP EXPERT TERCEIRIZACAO E CONSULTORIA',desc:'BPO FOPAG Janeiro 2026',rat:'PESSOAS',comp:'202601',val:2801.24,sad:'SAD-202600003561'},
+  {data:'20260224',forn:'ADM CENTRAL',desc:'Rateio Benefícios e Complementos 02/12',rat:'BENEFICIOS',comp:'202602',val:35000,sad:'SAD-202600002221'},
+  {data:'20260325',forn:'TECMAIS SOLUCOES PARA EVENTOS E MIDIAS',desc:'Equipamentos audiovisual Meeting 2026',rat:'PESSOAS',comp:'202603',val:18444,sad:'SAD-202600006597'},
+  {data:'20260326',forn:'FARROCO ABREU GUARNIERI E ZOTELLI ADV.',desc:'Honorários de partido Março 2026',rat:'JURIDICA',comp:'202603',val:4380.51,sad:'SAD-202600006948'},
+  {data:'20260327',forn:'WINDSOR ADMINISTRACAO DE HOTEIS',desc:'Hospedagem e A&B Meeting 2026',rat:'PESSOAS',comp:'202603',val:213812.41,sad:'SAD-202600006901'},
+  {data:'20260331',forn:'GWA COMUNICACAO INTEGRADA LTDA',desc:'Assessoria de Imprensa Mar/2026',rat:'PESSOAS',comp:'202603',val:16200,sad:'SAD-202600007000'},
+  {data:'20260406',forn:'ADM CENTRAL',desc:'Rateio Área de Pessoas e Cultura 04/12',rat:'PESSOAS',comp:'202604',val:17000,sad:'SAD-202600002510'},
+  {data:'20260406',forn:'ADM CENTRAL',desc:'Rateio Área Jurídica e Infraestrutura 04/12',rat:'JURIDICA',comp:'202604',val:13000,sad:'SAD-202600002674'},
+  {data:'20260406',forn:'ADM CENTRAL',desc:'Rateio ESG 04/12',rat:'ESG',comp:'202604',val:5500,sad:'SAD-202600002676'},
+  {data:'20260408',forn:'VIEIRA DE CASTRO MANSUR & FAVER ADVOGADOS',desc:'Honorários advocacia Março 2026',rat:'JURIDICA',comp:'202603',val:5631,sad:'SAD-202600007805'},
+  {data:'20260408',forn:'MARTINS NETO E WOLFF SOC. DE ADVOGADOS',desc:'Honorários advocacia Abril 2026',rat:'JURIDICA',comp:'202604',val:4400,sad:'SAD-202600007677'},
+  {data:'20260414',forn:'INGRAM MICRO BRASIL LTDA',desc:'Licenças Microsoft 365 Mar/2026',rat:'JURIDICA',comp:'202603',val:15931.29,sad:'SAD-202600006049'},
+  {data:'20260414',forn:'IRON MOUNTAIN DO BRASIL LTDA',desc:'Guarda externa de documentos Abr/2026',rat:'JURIDICA',comp:'202604',val:3907.22,sad:'SAD-202600009369'},
+  {data:'20260417',forn:'TM INOVACAO LTDA',desc:'Palestra Team Building — Meeting 2026',rat:'PESSOAS',comp:'202603',val:68800,sad:'SAD-202600009592'},
+  {data:'20260422',forn:'64.088.014 JULIANA FARIA PIRES',desc:'Produção Artística Meeting (samba, DJ, ECAD)',rat:'PESSOAS',comp:'202604',val:12800,sad:'SAD-202600009735'},
+  {data:'20260424',forn:'MEMORI S.A',desc:'Pagamento Memori — Abril 2026',rat:'BENEFICIOS',comp:'202604',val:8865.2,sad:'SAD-202600009777'},
+  {data:'20260424',forn:'SHOWMAR COMERCIO DE DOCES LTDA',desc:'Compra de Kits de Páscoa 2026',rat:'BENEFICIOS',comp:'202604',val:18179.78,sad:'SAD-202600009760'},
+  {data:'20260428',forn:'GWA COMUNICACAO INTEGRADA LTDA',desc:'Assessoria de Imprensa Abril/2026',rat:'PESSOAS',comp:'202604',val:16200,sad:'SAD-202600011059'},
+  {data:'20260428',forn:'ALLSTRATEGY SOLUCOES EM INFORMATICA',desc:'Allstrategy Pagamento Jan-Fev 2026',rat:'JURIDICA',comp:'202604',val:8353.12,sad:'SAD-202600007927'},
+  {data:'20260504',forn:'METROFILE RIO GERENCIAMENTO DE ARQUIVOS',desc:'Guarda externa documentos Mai/2026',rat:'JURIDICA',comp:'202605',val:1276.27,sad:'SAD-202600009368'},
+  {data:'20260506',forn:'ALINE CARVALHO MAZZOLI',desc:'Reembolso CapCut para edição de vídeo',rat:'PESSOAS',comp:'202605',val:187.9,sad:'SAD-202600011560'},
+  {data:'20260508',forn:'MARTINS NETO E WOLFF SOC. DE ADVOGADOS',desc:'Honorários advocatícios partido Maio',rat:'JURIDICA',comp:'202605',val:4400,sad:'SAD-202600012655'},
+  {data:'20260512',forn:'REBECA GUIMARAES GOMES',desc:'Reembolso Uber 05/05/26',rat:'BENEFICIOS',comp:'202605',val:37.98,sad:'SAD-202600013218'},
+];
+
+// ═══════════════════════════════════════
+// UTILITÁRIOS
+// ═══════════════════════════════════════
+const R = v => typeof v==='number'? 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : (v||'');
+const RS = v => typeof v==='number'? (v>=1e6?'R$ '+(v/1e6).toFixed(1)+'M':v>=1000?'R$ '+(v/1000).toFixed(0)+'k':'R$ '+v.toFixed(0)) : v;
+const FD = s => s&&s.length>=8? s.slice(6,8)+'/'+s.slice(4,6)+'/'+s.slice(0,4) : s;
+const TR = r => { const m={PESSOAS:['tp','Pessoas e Cultura'],JURIDICA:['tj','Jurídica'],BENEFICIOS:['tb','Benefícios'],ESG:['te','ESG']}; const [c,n]=m[r]||['','?']; return `<span class="tag ${c}">${n}</span>`; };
+
+function calcEmpresa(e){
+  const tots = {'509':0,'510':0,'511':0,'512':0};
+  e.crds.forEach(c => { if(c.tipo && tots[c.tipo]!==undefined) tots[c.tipo] += c.pessoas*(c.taxa||0); });
+  return tots;
+}
+function totalMensalEmpresa(e){
+  const t = calcEmpresa(e);
+  return Object.values(t).reduce((a,b)=>a+b,0);
+}
+function totalPessoasEmpresa(e){
+  return e.crds.reduce((s,c)=>s+Number(c.pessoas||0),0);
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  (btn||document.querySelector('.tab')).classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='rateio') renderRateio();
+  if(id==='controle-sad') buildCtrl('sad');
+  if(id==='controle-rec') buildCtrl('rec');
+  if(id==='transacoes') renderTr();
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard(){
+  const totMensal = EMPRESAS.reduce((s,e)=>s+totalMensalEmpresa(e),0);
+  const totPess = EMPRESAS.reduce((s,e)=>s+totalPessoasEmpresa(e),0);
+  const totTr = TRANSACOES.reduce((s,t)=>s+t.val,0);
+  document.getElementById('dashCards').innerHTML=`
+    <div class="card"><div class="card-lbl">Total Mensal</div><div class="card-val">${RS(totMensal)}</div><div class="card-sub">Todas as empresas</div></div>
+    <div class="card cc"><div class="card-lbl">Projeção Anual</div><div class="card-val">${RS(totMensal*12)}</div><div class="card-sub">12 × mensal</div></div>
+    <div class="card"><div class="card-lbl">Pessoas no Rateio</div><div class="card-val">${totPess}</div><div class="card-sub">Total de colaboradores</div></div>
+    <div class="card cv"><div class="card-lbl">Volume Transações</div><div class="card-val">${RS(totTr)}</div><div class="card-sub">${TRANSACOES.length} lançamentos</div></div>
+  `;
+  const maxV = Math.max(...EMPRESAS.map(e=>totalMensalEmpresa(e)));
+  const colors=['#1B3A5C','#2D5F8A','#4A8FC1','#00B4D8','#0EA5E9','#22C55E','#3B82F6','#8B5CF6','#F59E0B','#EF4444'];
+  document.getElementById('barChart').innerHTML = EMPRESAS.map((e,i)=>{
+    const t=totalMensalEmpresa(e); const p=Math.round(t/maxV*100);
+    return `<div class="bar-item"><div class="bar-lbl">${e.cod} ${e.nome}</div><div class="bar-trk"><div class="bar-fill" style="width:${p}%;background:${colors[i]};">${RS(t)}</div></div></div>`;
+  }).join('');
+  // Pie
+  const tipos=[
+    {id:'510',label:'Jurídica',color:'#3B82F6'},{id:'512',label:'ESG',color:'#10B981'},
+    {id:'511',label:'Benefícios',color:'#F59E0B'},{id:'509',label:'Pessoas e Cultura',color:'#8B5CF6'}
+  ];
+  tipos.forEach(t=>{ t.val=EMPRESAS.reduce((s,e)=>{ const c=calcEmpresa(e); return s+(c[t.id]||0); },0); });
+  const tot2=tipos.reduce((s,t)=>s+t.val,0);
+  const c2=document.getElementById('pieC'); const cx=c2.getContext('2d');
+  c2.width=180;c2.height=180; let ang=-Math.PI/2;
+  tipos.forEach(t=>{ const sl=(t.val/tot2)*2*Math.PI; cx.beginPath(); cx.moveTo(90,90); cx.arc(90,90,82,ang,ang+sl); cx.fillStyle=t.color; cx.fill(); ang+=sl; });
+  cx.beginPath(); cx.arc(90,90,46,0,2*Math.PI); cx.fillStyle='#fff'; cx.fill();
+  cx.fillStyle='#1B3A5C';cx.font='bold 12px sans-serif';cx.textAlign='center';cx.fillText(EMPRESAS.length,90,87);
+  cx.font='10px sans-serif';cx.fillStyle='#64748B';cx.fillText('empresas',90,101);
+  document.getElementById('pieLeg').innerHTML=tipos.map(t=>`<div class="leg-it"><div class="leg-dot" style="background:${t.color}"></div><div class="leg-nm">${t.label}</div><div class="leg-vl">${RS(t.val)}</div><div class="leg-pct">${tot2?Math.round(t.val/tot2*100):0}%</div></div>`).join('');
+  // Line
+  const sadE=Object.values(SAD_DATA);
+  const mT=MESES.map((_,mi)=>{ let s=0; sadE.forEach(e=>['juridica','esg','beneficios','pessoas'].forEach(k=>{ const v=e[k][mi]; if(typeof v==='number') s+=v; })); return s; });
+  const lc=document.getElementById('lineC'); const lx=lc.getContext('2d');
+  lc.width=800;lc.height=140; const W=800,H=140,pad=38;
+  lx.fillStyle='#F8FAFC';lx.fillRect(0,0,W,H);
+  const mxT=Math.max(...mT.filter(v=>v>0));
+  const pts=mT.map((v,i)=>({x:pad+i*(W-2*pad)/11,y:H-pad-(v>0?(v/mxT)*(H-2*pad):0)}));
+  for(let i=0;i<=3;i++){ const y=H-pad-(i/3)*(H-2*pad); lx.strokeStyle='#E2E8F0';lx.lineWidth=1;lx.beginPath();lx.moveTo(pad,y);lx.lineTo(W-pad,y);lx.stroke();lx.fillStyle='#94A3B8';lx.font='9px sans-serif';lx.textAlign='right';lx.fillText(RS(i/3*mxT),pad-3,y+3); }
+  lx.beginPath();pts.forEach((p,i)=>i?lx.lineTo(p.x,p.y):lx.moveTo(p.x,p.y));lx.strokeStyle='#2D5F8A';lx.lineWidth=2;lx.stroke();
+  lx.beginPath();pts.forEach((p,i)=>i?lx.lineTo(p.x,p.y):lx.moveTo(p.x,p.y));lx.lineTo(pts[pts.length-1].x,H-pad);lx.lineTo(pts[0].x,H-pad);lx.fillStyle='rgba(45,95,138,.1)';lx.fill();
+  MESES.forEach((m,i)=>{ const p=pts[i]; if(mT[i]>0){lx.beginPath();lx.arc(p.x,p.y,4,0,2*Math.PI);lx.fillStyle='#1B3A5C';lx.fill();} lx.fillStyle='#64748B';lx.font='10px sans-serif';lx.textAlign='center';lx.fillText(m,p.x,H-pad+13); });
+}
+
+// ═══════════════════════════════════════
+// RATEIO POR EMPRESA
+// ═══════════════════════════════════════
+function renderRateio(){
+  const tot = EMPRESAS.reduce((s,e)=>s+totalMensalEmpresa(e),0);
+  const tots = {509:0,510:0,511:0,512:0};
+  EMPRESAS.forEach(e=>{ const c=calcEmpresa(e); Object.keys(tots).forEach(k=>tots[k]+=(c[k]||0)); });
+  document.getElementById('ratSumCards').innerHTML=`
+    <div class="card"><div class="card-lbl">Total Mensal Geral</div><div class="card-val">${R(tot)}</div><div class="card-sub">Todas as empresas</div></div>
+    <div class="card cc"><div class="card-lbl">Rateio Jurídica</div><div class="card-val">${RS(tots[510])}</div><div class="card-sub">TD-510 · R$ 650/pessoa</div></div>
+    <div class="card" style=""><div class="card-lbl">Rateio ESG</div><div class="card-val" style="color:#10B981">${RS(tots[512])}</div><div class="card-sub">TD-512 · R$ 275/pessoa</div></div>
+    <div class="card"><div class="card-lbl">Rateio Benefícios</div><div class="card-val" style="color:#D97706">${RS(tots[511])}</div><div class="card-sub">TD-511 · R$ 1.750/pessoa</div></div>
+    <div class="card"><div class="card-lbl">Rateio Pessoas e Cultura</div><div class="card-val" style="color:#7C3AED">${RS(tots[509])}</div><div class="card-sub">TD-509 · R$ 850/pessoa</div></div>
+  `;
+  document.getElementById('empGrid').innerHTML = EMPRESAS.map((e,i)=>{
+    const c=calcEmpresa(e); const tot=totalMensalEmpresa(e); const np=totalPessoasEmpresa(e);
+    return `<div class="emp-card" onclick="openCRD(${i})">
+      <div class="emp-hdr"><h3>${e.icon} ${e.cod} — ${e.nome}</h3><div class="meta"><span>👤 ${np} pessoas</span></div></div>
+      <div class="emp-body">
+        <div class="r-row"><div class="r-lbl"><div class="r-dot dj"></div> Jurídica &amp; Infr.</div><div class="r-val">${R(c['510']||0)}</div></div>
+        <div class="r-row"><div class="r-lbl"><div class="r-dot de"></div> ESG</div><div class="r-val">${R(c['512']||0)}</div></div>
+        <div class="r-row"><div class="r-lbl"><div class="r-dot db"></div> Benefícios</div><div class="r-val">${R(c['511']||0)}</div></div>
+        <div class="r-row"><div class="r-lbl"><div class="r-dot dp"></div> Pessoas e Cultura</div><div class="r-val">${R(c['509']||0)}</div></div>
+        <div class="emp-tot"><span>Total Mensal</span><span>${R(tot)}</span></div>
+      </div>
+      <div class="emp-footer">
+        <span>${e.crds.length} CRD${e.crds.length!==1?'s':''} cadastrado${e.crds.length!==1?'s':''}</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="btn-sad" onclick="event.stopPropagation();abrirModalGerarDoc(${i},'sad')" title="Gerar SAD (Conta a Pagar)">💳 CRIAR SAD</button>
+          <button class="btn-rec" onclick="event.stopPropagation();abrirModalGerarDoc(${i},'rec')" title="Gerar REC (Conta a Receber)">🏦 CRIAR REC</button>
+          <div class="btn-edit" onclick="event.stopPropagation();openCRD(${i})">✏️ CRDs</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// MODAL EDITOR CRD
+// ═══════════════════════════════════════
+let editIdx = -1;
+let editCRDs = [];
+let filtroTipo = null; // null = todos
+
+const TIPO_COLORS = {
+  '509': { bg:'#EDE9FE', border:'#8B5CF6', txt:'#5B21B6', dot:'#8B5CF6', label:'Pessoas e Cultura',  td:'509' },
+  '510': { bg:'#DBEAFE', border:'#3B82F6', txt:'#1D4ED8', dot:'#3B82F6', label:'Jurídica e Infr.',   td:'510' },
+  '511': { bg:'#FEF3C7', border:'#F59E0B', txt:'#92400E', dot:'#F59E0B', label:'Benefícios',          td:'511' },
+  '512': { bg:'#D1FAE5', border:'#10B981', txt:'#065F46', dot:'#10B981', label:'ESG',                 td:'512' },
+};
+
+function openCRD(i){
+  editIdx = i;
+  filtroTipo = null;
+  editCRDs = JSON.parse(JSON.stringify(EMPRESAS[i].crds));
+  const e = EMPRESAS[i];
+  document.getElementById('moTitle').innerHTML = `✏️ ${e.icon} ${e.cod} — ${e.nome}`;
+  document.getElementById('moMeta').textContent = `${editCRDs.length} CRD(s) cadastrado(s)`;
+  renderTipoCards();
+  renderCRDTbody();
+  document.getElementById('moCRD').classList.add('open');
+}
+
+function calcTotsPorTipo(){
+  const tots = {'509':{val:0,pess:0,qtd:0},'510':{val:0,pess:0,qtd:0},'511':{val:0,pess:0,qtd:0},'512':{val:0,pess:0,qtd:0}};
+  editCRDs.forEach(c=>{
+    if(c.tipo && tots[c.tipo]){
+      tots[c.tipo].val  += (c.pessoas||0) * (c.taxa||0);
+      tots[c.tipo].pess += (c.pessoas||0);
+      tots[c.tipo].qtd  += 1;
+    }
+  });
+  return tots;
+}
+
+function renderTipoCards(){
+  const tots = calcTotsPorTipo();
+  const grandVal  = editCRDs.reduce((s,c)=>s+(c.pessoas||0)*(c.taxa||0),0);
+  const grandPess = editCRDs.reduce((s,c)=>s+(+c.pessoas||0),0);
+  const grandQtd  = editCRDs.length;
+
+  // Card "Todos"
+  let html = `
+    <div onclick="setFiltroTipo(null,this)" data-tipo="null"
+      style="border-radius:10px;padding:12px 14px;cursor:pointer;border:2px solid ${filtroTipo===null?'#1B3A5C':'#CBD5E1'};background:${filtroTipo===null?'#1B3A5C':'#fff'};transition:all .15s;text-align:center;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${filtroTipo===null?'rgba(255,255,255,.75)':'#64748B'};">Todos</div>
+      <div style="font-size:20px;font-weight:800;color:${filtroTipo===null?'#fff':'#1B3A5C'};margin:4px 0;">${R(grandVal)}</div>
+      <div style="font-size:11px;color:${filtroTipo===null?'rgba(255,255,255,.7)':'#94A3B8'};">👤 ${grandPess} pessoas · ${grandQtd} CRD${grandQtd!==1?'s':''}</div>
+    </div>`;
+
+  // Cards por tipo
+  Object.entries(TIPO_COLORS).forEach(([k,tc])=>{
+    const t = tots[k];
+    const ativo = filtroTipo === k;
+    html += `
+      <div onclick="setFiltroTipo('${k}',this)" data-tipo="${k}"
+        style="border-radius:10px;padding:12px 14px;cursor:pointer;border:2px solid ${ativo?tc.border:tc.border+'55'};background:${ativo?tc.bg:'#fff'};transition:all .15s;text-align:center;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${ativo?tc.txt:'#94A3B8'};">${tc.label}</div>
+        <div style="font-size:20px;font-weight:800;color:${tc.txt};margin:4px 0;">${R(t.val)}</div>
+        <div style="font-size:11px;color:${tc.txt};opacity:.75;">👤 ${t.pess} pessoas · ${t.qtd} CRD${t.qtd!==1?'s':''}</div>
+      </div>`;
+  });
+
+  document.getElementById('tipoCards').innerHTML = html;
+  document.getElementById('tipoCards').style.gridTemplateColumns = 'repeat(5,1fr)';
+}
+
+function setFiltroTipo(k, el){
+  filtroTipo = k;
+  renderTipoCards();
+  renderCRDTbody();
+}
+
+function renderCRDTbody(){
+  const tbody = document.getElementById('crdTbody');
+  // Filtra pelo tipo selecionado
+  const lista = filtroTipo ? editCRDs.map((c,i)=>({...c,_i:i})).filter(c=>c.tipo===filtroTipo)
+                           : editCRDs.map((c,i)=>({...c,_i:i}));
+
+  // Subtitle
+  const lbl = filtroTipo ? TIPO_COLORS[filtroTipo].label : 'Todos os CRDs';
+  document.getElementById('crdSubtitle').textContent = `${lbl} — ${lista.length} CRD${lista.length!==1?'s':''}`;
+
+  if(!lista.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--cinza);font-size:13px;">
+      Nenhum CRD${filtroTipo?' do tipo '+TIPO_COLORS[filtroTipo].label:''}. Clique em "＋ Novo CRD" para adicionar.
+    </td></tr>`;
+    updateFooter(lista);
+    return;
+  }
+
+  tbody.innerHTML = lista.map(c=>{
+    const i = c._i;
+    const tc = TIPO_COLORS[c.tipo]||{bg:'#fff',txt:'#333'};
+    return `<tr id="crd-row-${i}" style="transition:background .1s;">
+      <td><input class="inp" value="${c.crd||''}" onchange="setCRD(${i},'crd',this.value)" placeholder="Ex: 182030001"></td>
+      <td><input class="inp" value="${c.dept||''}" onchange="setCRD(${i},'dept',this.value)" placeholder="Nome do departamento"></td>
+      <td style="text-align:center;">
+        <input class="inp inp-num" type="number" min="0" value="${c.pessoas||0}"
+          oninput="setCRD(${i},'pessoas',+this.value);updateCRDTotals()" style="width:64px;text-align:center;">
+      </td>
+      <td>
+        <select class="inp" style="font-size:12px;" onchange="setCRD(${i},'tipo',this.value);setCRDTaxa(${i},this.value);updateCRDTotals()">
+          ${Object.entries(TIPO_COLORS).map(([k,v])=>`<option value="${k}" ${c.tipo===k?'selected':''}>${k} — ${v.label}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <input class="inp inp-num" type="number" min="0" step="0.01" value="${c.taxa||0}"
+          oninput="setCRD(${i},'taxa',+this.value);updateCRDTotals()" style="width:84px;">
+      </td>
+      <td class="crd-calc" id="crd-tot-${i}" style="background:${tc.bg};color:${tc.txt};font-weight:700;text-align:right;">
+        ${R((c.pessoas||0)*(c.taxa||0))}
+      </td>
+      <td><button class="del-btn" onclick="delCRD(${i})" title="Excluir">🗑</button></td>
+    </tr>`;
+  }).join('');
+
+  updateFooter(lista);
+}
+
+function updateFooter(lista){
+  const totPess = lista.reduce((s,c)=>s+(+c.pessoas||0),0);
+  const totVal  = lista.reduce((s,c)=>s+(c.pessoas||0)*(c.taxa||0),0);
+  document.getElementById('ftPessoas').textContent = totPess;
+  document.getElementById('ftTotal').textContent   = R(totVal);
+}
+
+function setCRD(i,k,v){
+  editCRDs[i][k] = v;
+  const el = document.getElementById('crd-tot-'+i);
+  if(el){
+    const c = editCRDs[i];
+    const tc = TIPO_COLORS[c.tipo]||{bg:'#F8FAFC',txt:'#1E293B'};
+    el.textContent = R((c.pessoas||0)*(c.taxa||0));
+    el.style.background = tc.bg;
+    el.style.color = tc.txt;
+  }
+}
+
+function setCRDTaxa(i, tipo){
+  const taxa = TAXAS[tipo]||0;
+  editCRDs[i].taxa = taxa;
+  // atualiza campo taxa na linha
+  const row = document.getElementById('crd-row-'+i);
+  if(row){
+    const inputs = row.querySelectorAll('input[type="number"]');
+    if(inputs[1]) inputs[1].value = taxa;
+  }
+}
+
+function updateCRDTotals(){
+  // recalcula cards e footer com dados mais recentes
+  renderTipoCards();
+  // recalcula footer da lista filtrada
+  const lista = filtroTipo ? editCRDs.map((c,i)=>({...c,_i:i})).filter(c=>c.tipo===filtroTipo)
+                           : editCRDs.map((c,i)=>({...c,_i:i}));
+  updateFooter(lista);
+  // atualiza também o subtitle
+  const lbl = filtroTipo ? TIPO_COLORS[filtroTipo].label : 'Todos os CRDs';
+  document.getElementById('crdSubtitle').textContent = `${lbl} — ${lista.length} CRD${lista.length!==1?'s':''}`;
+  // atualiza meta no header
+  document.getElementById('moMeta').textContent = `${editCRDs.length} CRD(s) cadastrado(s)`;
+}
+
+function delCRD(i){
+  editCRDs.splice(i,1);
+  renderTipoCards();
+  renderCRDTbody();
+}
+
+function addCRDRow(){
+  const tipo = filtroTipo || EMPRESAS[editIdx].tiposAtivos?.[0] || '510';
+  editCRDs.push({crd:'',dept:'',pessoas:0,tipo,taxa:TAXAS[tipo]||0});
+  // Se havia filtro ativo, mantenha (o novo CRD já foi criado nesse tipo)
+  renderTipoCards();
+  renderCRDTbody();
+  setTimeout(()=>{
+    const rows=document.getElementById('crdTbody').querySelectorAll('tr');
+    const last=rows[rows.length-1];
+    if(last) last.scrollIntoView({behavior:'smooth',block:'nearest'});
+    // foca no campo CRD da última linha
+    const inp=last?.querySelector('input');
+    if(inp) inp.focus();
+  },60);
+}
+
+function saveCRD(){
+  EMPRESAS[editIdx].crds = editCRDs;
+  closeMoCRDBtn();
+  renderRateio();
+  showToast('✅ CRDs salvos com sucesso!','ok');
+}
+
+function closeMoCRD(e){ if(e.target.id==='moCRD') closeMoCRDBtn(); }
+function closeMoCRDBtn(){ document.getElementById('moCRD').classList.remove('open'); filtroTipo=null; }
+
+// ═══════════════════════════════════════
+// CONTROLE SAD/REC TABLE
+// ═══════════════════════════════════════
+function buildCtrl(tipo){
+  const data = tipo==='sad' ? SAD_DATA : REC_DATA;
+  const emps = Object.keys(data);
+  let totJ=0,totMes=0;
+  emps.forEach(em=>{ const d=data[em]; ['juridica','esg','beneficios','pessoas'].forEach(k=>{ const v=d[k][0]; if(typeof v==='number') totJ+=v; d[k].forEach(m=>{ if(typeof m==='number') totMes+=m; }); }); });
+  const cardId = tipo==='sad' ? 'sadCards' : 'recCards';
+  document.getElementById(cardId).innerHTML=`
+    <div class="card"><div class="card-lbl">Janeiro 2026</div><div class="card-val">${RS(totJ)}</div><div class="card-sub">Primeiro mês</div></div>
+    <div class="card cc"><div class="card-lbl">Total Acumulado (Jan–Jun)</div><div class="card-val">${RS(totMes)}</div></div>
+    <div class="card"><div class="card-lbl">Empresas</div><div class="card-val">${emps.length}</div></div>
+  `;
+  const lbls={juridica:'Jurídica &amp; Infr.',esg:'ESG',beneficios:'Benefícios',pessoas:'Pessoas e Cultura'};
+  const tblId = tipo==='sad' ? 'sadTbl' : 'recTbl';
+  const tbl = document.getElementById(tblId);
+  tbl.innerHTML=`<thead><tr><th style="min-width:190px;">Tipo de Rateio</th>${MESES.map(m=>`<th>${m}</th>`).join('')}<th>TOTAL</th></tr></thead><tbody></tbody>`;
+  const tbody=tbl.querySelector('tbody');
+  let grand=Array(12).fill(0);
+  emps.forEach(em=>{
+    const d=data[em];
+    const hr=tbody.insertRow();
+    const tc=hr.insertCell(); tc.colSpan=14; tc.innerHTML=`🏢 ${em}`; tc.className='';
+    hr.className='emp-lbl';
+    let sub=Array(12).fill(0);
+    ['juridica','esg','beneficios','pessoas'].forEach(k=>{
+      const row=tbody.insertRow();
+      const tot=d[k].reduce((s,v)=>s+(typeof v==='number'?v:0),0);
+      row.insertCell().innerHTML=`<span style="padding-left:14px;">${lbls[k]}</span>`;
+      d[k].forEach((v,i)=>{
+        const td=row.insertCell(); td.style.textAlign='right';
+        if(typeof v==='number'){td.textContent=R(v);sub[i]+=v;grand[i]+=v;}
+        else td.innerHTML=`<span class="dash">—</span>`;
+      });
+      const tc=row.insertCell(); tc.style.cssText='text-align:right;font-weight:700;';tc.textContent=tot>0?R(tot):'';
+    });
+    const sr=tbody.insertRow(); sr.className='sub';
+    sr.insertCell().textContent=`SUBTOTAL ${em}`;
+    sub.forEach(v=>{ const td=sr.insertCell(); td.style.textAlign='right'; td.textContent=v>0?R(v):''; });
+    const stot=sub.reduce((a,b)=>a+b,0); const stc=sr.insertCell(); stc.style.cssText='text-align:right;'; stc.textContent=R(stot);
+  });
+  const tr=tbody.insertRow(); tr.className='gtot';
+  const gtd=tr.insertCell(); gtd.textContent='🏆 TOTAL GERAL';
+  grand.forEach(v=>{ const td=tr.insertCell(); td.style.textAlign='right'; td.textContent=v>0?R(v):''; });
+  const gtot=grand.reduce((a,b)=>a+b,0); const gc=tr.insertCell(); gc.style.textAlign='right'; gc.textContent=R(gtot);
+}
+
+// ═══════════════════════════════════════
+// GERAR SAD / REC — CHAMA API WSGA
+// ═══════════════════════════════════════
+let gerarEmpIdx = -1;
+let gerarTipoDoc = 'sad'; // 'sad' ou 'rec'
+
+const TIPO_LABEL = {
+  '509':'Pessoas e Cultura (TD-509)',
+  '510':'Jurídica e Infr. (TD-510)',
+  '511':'Benefícios (TD-511)',
+  '512':'ESG (TD-512)',
+};
+
+function toggleCfgWsga(){
+  const p = document.getElementById('cfgWsgaPanel');
+  const a = document.getElementById('cfgWsgaArrow');
+  const vis = p.style.display !== 'none';
+  p.style.display = vis ? 'none' : 'block';
+  a.textContent = vis ? '▼' : '▲';
+}
+
+function abrirModalGerarDoc(i, tipo){
+  gerarEmpIdx = i;
+  gerarTipoDoc = tipo;
+  const e = EMPRESAS[i];
+
+  // Título e cor
+  const isSad = tipo === 'sad';
+  document.getElementById('moGerarHdr').style.background =
+    isSad ? 'linear-gradient(135deg,#7F1D1D,#DC2626)' : 'linear-gradient(135deg,#064E3B,#059669)';
+  document.getElementById('moGerarTitle').innerHTML =
+    `📅 ${e.icon} ${e.cod} ${e.nome} — ${isSad ? 'Criar SADs' : 'Criar RECs'}`;
+  document.getElementById('moGerarSub').textContent =
+    'Preencha as competências e vencimentos. Deixe em branco as que não usar.';
+  document.getElementById('btnGerarLabel').textContent =
+    isSad ? 'GERAR SADs no StarSoft' : 'GERAR RECs no StarSoft';
+
+  // Preenche 3 linhas com datas sugeridas a partir do mês atual
+  const hoje = new Date();
+  const rows = [];
+  for(let r=0; r<3; r++){
+    const d = new Date(hoje.getFullYear(), hoje.getMonth()+r, 1);
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const aaaa = d.getFullYear();
+    const diavenc = '20';
+    const mmvenc = mm;
+    const aaavenc = aaaa;
+    rows.push({ comp: `${mm}/${aaaa}`, venc: `${diavenc}/${mmvenc}/${aaavenc}` });
+  }
+  montarTabelaCompetencias(rows);
+
+  // Resumo
+  const tots = calcEmpresa(e);
+  const total = totalMensalEmpresa(e);
+  const np = totalPessoasEmpresa(e);
+  const resumo = document.getElementById('gerarResumo');
+  resumo.style.display = 'block';
+  document.getElementById('gerarResumoTxt').innerHTML =
+    `💰 Total mensal: <strong>${R(total)}</strong> &nbsp;|&nbsp; 👤 ${np} pessoas &nbsp;|&nbsp; ` +
+    `${e.crds.length} CRDs &nbsp;|&nbsp; ` +
+    `Jur: ${R(tots['510']||0)} · ESG: ${R(tots['512']||0)} · Ben: ${R(tots['511']||0)} · Pess: ${R(tots['509']||0)}`;
+
+  // Limpa log
+  document.getElementById('gerarLog').style.display = 'none';
+  document.getElementById('gerarLogContent').innerHTML = '';
+  document.getElementById('btnGerarExecutar').disabled = false;
+  document.getElementById('btnGerarExecutar').style.opacity = '1';
+
+  document.getElementById('moGerarDoc').classList.add('open');
+}
+
+function montarTabelaCompetencias(rows){
+  const N = 6; // máximo de linhas
+  let html = '';
+  for(let i=0; i<N; i++){
+    const comp = rows[i]?.comp || '';
+    const venc = rows[i]?.venc || '';
+    html += `<tr style="border-bottom:1px solid var(--cinza-c);">
+      <td style="padding:9px 8px;text-align:center;font-size:13px;font-weight:700;color:var(--cinza);">${i+1}</td>
+      <td style="padding:9px 8px;">
+        <input id="comp_${i}" value="${comp}" placeholder="MM/AAAA"
+          style="width:150px;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;font-family:inherit;text-align:center;"
+          oninput="formatarCompetencia(this)" maxlength="7">
+      </td>
+      <td style="padding:9px 8px;">
+        <input id="venc_${i}" value="${venc}" placeholder="DD/MM/AAAA"
+          style="width:160px;border:1.5px solid var(--cinza-c);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;font-family:inherit;text-align:center;"
+          oninput="formatarVencimento(this)" maxlength="10">
+      </td>
+    </tr>`;
+  }
+  document.getElementById('competenciasBody').innerHTML = html;
+}
+
+function formatarCompetencia(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length>2) v = v.slice(0,2)+'/'+v.slice(2,6);
+  el.value = v;
+}
+
+function formatarVencimento(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length>2) v = v.slice(0,2)+'/'+v.slice(2);
+  if(v.length>5) v = v.slice(0,5)+'/'+v.slice(5,9);
+  el.value = v;
+}
+
+function fecharModalGerarDoc(e){
+  if(e.target.id==='moGerarDoc') document.getElementById('moGerarDoc').classList.remove('open');
+}
+
+// Coleta linhas preenchidas
+function coletarLinhas(){
+  const linhas = [];
+  for(let i=0; i<6; i++){
+    const comp = (document.getElementById(`comp_${i}`)?.value||'').trim();
+    const venc = (document.getElementById(`venc_${i}`)?.value||'').trim();
+    if(comp && venc && comp.length===7 && venc.length===10){
+      // converte MM/AAAA → AAAA-MM-01 e DD/MM/AAAA → AAAA-MM-DD
+      const [mm,aaaa] = comp.split('/');
+      const [dd,mmv,aaaav] = venc.split('/');
+      linhas.push({
+        competencia: `${aaaa}-${mm}-01`,      // para o campo data
+        competenciaAAAMM: `${aaaa}${mm}`,      // para campo AAAAMM
+        vencimento: `${aaaav}-${mmv}-${dd}`,   // AAAA-MM-DD
+        emissao: new Date().toISOString().slice(0,10),
+        label: `${mm}/${aaaa}`,
+      });
+    }
+  }
+  return linhas;
+}
+
+// Monta XML do payload SAD (NEWNOTAFISCALENTRADA)
+function montarPayloadSAD(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId){
+  const TD_MAP = { '509':'TD-0000509','510':'TD-0000510','511':'TD-0000511','512':'TD-0000512' };
+  const tipoDoc = TD_MAP[tipoRateio] || 'TD-0000509';
+  const ukeyOri = 'SOT__3C06_156605899B'; // Ukey real da ADM CENTRAL no StarSoft
+  const serie   = e.cod + '-' + tipoRateio + '-' + linha.competenciaAAAMM;
+  const coment  = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
+
+  // CRD no rateio SEM PONTOS (confirmado no wsga_soap.py que funciona)
+  // Percentual: último item recebe resíduo para garantir soma exata 100%
+  let somaPerc = 0;
+  const rateioXml = crdsGrupo.map((c, idx) => {
+    const val = (c.pessoas||0)*(c.taxa||0);
+    let pct;
+    if(idx === crdsGrupo.length - 1){
+      pct = (100.0 - somaPerc).toFixed(6);
+    } else {
+      pct = valorTotal > 0 ? (val/valorTotal*100).toFixed(6) : '0.000000';
+      somaPerc += parseFloat(pct);
+    }
+    const crdSemPontos = c.crd.replace(/\./g,'');
+    return '<SDTNotaFiscalRateio.SDTNotaFiscalRateioItem>'
+      + '<NotaFiscalRateioCRDCod>'+crdSemPontos+'</NotaFiscalRateioCRDCod>'
+      + '<NotaFiscalRateioPercentual>'+pct+'</NotaFiscalRateioPercentual>'
+      + '<NotaFiscalRateioValor>'+val.toFixed(2)+'</NotaFiscalRateioValor>'
+      + '</SDTNotaFiscalRateio.SDTNotaFiscalRateioItem>';
+  }).join('');
+
+  // Monta XML completo — tag interna é Sdtnewnotafiscalentrada (minúsculas após SDT)
+  // conforme wsga_soap.py que já funciona em produção
+  return '<Sdtnewnotafiscalentrada>'
+    + '<SessionId>'+sessionId+'</SessionId>'
+    + '<NotaFiscalEntradaEmpresa>'+e.cod+'</NotaFiscalEntradaEmpresa>'
+    + '<NotaFiscalEntradaEmissao>'+linha.emissao+'</NotaFiscalEntradaEmissao>'
+    + '<NotaFiscalEntradaCod></NotaFiscalEntradaCod>'
+    + '<NotaFiscalEntradaOrigem>F</NotaFiscalEntradaOrigem>'
+    + '<NotaFiscalEntradaOrigemCodigo>'+serie+'</NotaFiscalEntradaOrigemCodigo>'
+    + '<NotaFiscalEntradaOrigemCodigo>06744</NotaFiscalEntradaOrigemCodigo>'
+    + '<NotaFiscalEntradaOrigemCNPJ></NotaFiscalEntradaOrigemCNPJ>'
+    + '<NotaFiscalEntradaOrigemUkey>'+ukeyOri+'</NotaFiscalEntradaOrigemUkey>'
+    + '<NotaFiscalEntradaOrigemNomeFantasia>ADM CENTRAL</NotaFiscalEntradaOrigemNomeFantasia>'
+    + '<NotaFiscalEntradaOrigemRazaoSocial>ADM CENTRAL</NotaFiscalEntradaOrigemRazaoSocial>'
+    + '<NotaFiscalEntradaOrigemOrigem>N</NotaFiscalEntradaOrigemOrigem>'
+    + '<NotaFiscalEntradaOrigemTipoPessoa>J</NotaFiscalEntradaOrigemTipoPessoa>'
+    + '<NotaFiscalEntradaOrigemEndereco>AV DAS AMERICAS 3434 BL 5 SALA 524</NotaFiscalEntradaOrigemEndereco>'
+    + '<NotaFiscalEntradaOrigemCep>22640-02</NotaFiscalEntradaOrigemCep>'
+    + '<NotaFiscalEntradaOrigemCidade>RIO DE JANEIRO</NotaFiscalEntradaOrigemCidade>'
+    + '<NotaFiscalEntradaOrigemTipo>FOR</NotaFiscalEntradaOrigemTipo>'
+    + '<NotaFiscalEntradaOrigemClassificacao>2</NotaFiscalEntradaOrigemClassificacao>'
+    + '<NotaFiscalEntradaMoeda>SMBR</NotaFiscalEntradaMoeda>'
+    + '<NotaFiscalEntradaTipoDocumento>'+tipoDoc+'</NotaFiscalEntradaTipoDocumento>'
+    + '<NotaFiscalEntradaCompetencia>'+linha.competencia+'</NotaFiscalEntradaCompetencia>'
+    + '<NotaFiscalEntradaDtEntrada>'+linha.emissao+'</NotaFiscalEntradaDtEntrada>'
+    + '<NotaFiscalEntradaValorTotal>'+valorTotal.toFixed(2)+'</NotaFiscalEntradaValorTotal>'
+    + '<NotaFiscalEntradaQtdParcela>1</NotaFiscalEntradaQtdParcela>'
+    + '<NotaFiscalEntradaSerieDocumento>'+serie+'</NotaFiscalEntradaSerieDocumento>'
+    + '<NotaFiscalEntradaFaturaFornecedor>'+serie+'</NotaFiscalEntradaFaturaFornecedor>'
+    + '<NotaFiscalEntradaComentario><![CDATA['+coment+']]></NotaFiscalEntradaComentario>'
+    + '<NotaFiscalParcela>'
+    + '<SDTNotaFiscalParcelas.SDTNotaFiscalParcelasItem>'
+    + '<NotaFiscalParcelaOrdem>1</NotaFiscalParcelaOrdem>'
+    + '<NotaFiscalParcelaVctoNominal>'+linha.vencimento+'</NotaFiscalParcelaVctoNominal>'
+    + '<NotaFiscalParcelaVctoReal>'+linha.vencimento+'</NotaFiscalParcelaVctoReal>'
+    + '<NotaFiscalParcelaValorBruto>'+valorTotal.toFixed(2)+'</NotaFiscalParcelaValorBruto>'
+    + '<NotaFiscalParcelaValorLiquido>'+valorTotal.toFixed(2)+'</NotaFiscalParcelaValorLiquido>'
+    + '<NotaFiscalParcelaMoeda>SMBR</NotaFiscalParcelaMoeda>'
+    + '<NotaFiscalParcelaTipoDocumento>'+tipoDoc+'</NotaFiscalParcelaTipoDocumento>'
+    + '<NotaFiscalParcelaCompetencia>'+linha.competencia+'</NotaFiscalParcelaCompetencia>'
+    + '</SDTNotaFiscalParcelas.SDTNotaFiscalParcelasItem>'
+    + '</NotaFiscalParcela>'
+    + '<NotaFiscalItem>'
+    + '<SDTNotaFiscalItem.SDTNotaFiscalItemItem>'
+    + '<NotaFiscalItemTipo>E000</NotaFiscalItemTipo>'
+    + '<NotaFiscalItemCod>IE-007</NotaFiscalItemCod>'
+    + '<NotaFiscalItemQtd>1</NotaFiscalItemQtd>'
+    + '<NotaFiscalItemValorUnitario>'+valorTotal.toFixed(2)+'</NotaFiscalItemValorUnitario>'
+    + '<NotaFiscalItemValorTotal>'+valorTotal.toFixed(2)+'</NotaFiscalItemValorTotal>'
+    + '<NotaFiscalItemComentario><![CDATA['+coment+']]></NotaFiscalItemComentario>'
+    + '</SDTNotaFiscalItem.SDTNotaFiscalItemItem>'
+    + '</NotaFiscalItem>'
+    + '<NotaFiscalRateio>'
+    + rateioXml
+    + '</NotaFiscalRateio>'
+    + '</Sdtnewnotafiscalentrada>';
+}
+
+// Monta XML do payload REC (NEWREC)
+function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId){
+  const session  = sessionId || document.getElementById('wsgaSession').value || '';
+  const ukeyOri  = document.getElementById('wsgaUkey').value || '';
+  const tipoDoc  = document.getElementById('wsgaTipoDoc').value || 'TD-0000081';
+
+  const rateioItems = crdsGrupo.map(c=>{
+    const val = (c.pessoas||0)*(c.taxa||0);
+    const pct = valorTotal>0 ? (val/valorTotal*100).toFixed(6) : '0.000000';
+    return `<SDTContasAReceberRateio.SDTContasAReceberRateioItem>
+<ContasAReceberRateioCRDCod>${c.crd}</ContasAReceberRateioCRDCod>
+<ContasAReceberRateioPercentual>${pct}</ContasAReceberRateioPercentual>
+<ContasAReceberRateioValor>${val.toFixed(2)}</ContasAReceberRateioValor>
+</SDTContasAReceberRateio.SDTContasAReceberRateioItem>`;
+  }).join('\n');
+
+  const comentario = `<![CDATA[Rateio ${TIPO_LABEL[tipoRateio]} — ${e.cod} ${e.nome} — Competência ${linha.label}]]>`;
+
+  return `<SDTNewRec>
+<SessionId>${session}</SessionId>
+<ContasAReceberEmpresa>${e.cod}</ContasAReceberEmpresa>
+<ContasAReceberCod/>
+<ContasAReceberOrigem>C</ContasAReceberOrigem>
+<ContasAReceberCodOrigem/>
+<ContasAReceberCnpjOrigem/>
+<ContasAReceberUkeyOrigem>${ukeyOri}</ContasAReceberUkeyOrigem>
+<ContasAReceberOrigemNomeFantasia/>
+<ContasAReceberOrigemRazaoSocial/>
+<ContasAReceberOrigemOrigem/>
+<ContasAReceberOrigemTipoPessoa/>
+<ContasAReceberOrigemEndereco/>
+<ContasAReceberOrigemComplemento/>
+<ContasAReceberOrigemNumero/>
+<ContasAReceberOrigemCep/>
+<ContasAReceberOrigemBairro/>
+<ContasAReceberOrigemPais/>
+<ContasAReceberOrigemEstado/>
+<ContasAReceberOrigemCidade/>
+<ContasAReceberOrigemDDD/>
+<ContasAReceberOrigemTelefone/>
+<ContasAReceberOrigemContato/>
+<ContasAReceberOrigemFax/>
+<ContasAReceberOrigemEmail/>
+<ContasAReceberOrigemwww/>
+<ContasAReceberOrigemTipo/>
+<ContasAReceberOrigemClassificacao>0</ContasAReceberOrigemClassificacao>
+<ContasAReceberOrigemInscricao/>
+<ContasAReceberOrigemCCM/>
+<ContasAReceberOrigemRamal/>
+<ContasAReceberMoeda>SMBR</ContasAReceberMoeda>
+<ContasAReceberTipoDocumento>${tipoDoc}</ContasAReceberTipoDocumento>
+<ContasAReceberCompetencia>${linha.competenciaAAAMM}</ContasAReceberCompetencia>
+<ContasAReceberValorTotal>${valorTotal.toFixed(2)}</ContasAReceberValorTotal>
+<ContasAReceberQtdParcela>1</ContasAReceberQtdParcela>
+<ContasAReceberSerieDocumento>${e.cod}-${tipoRateio}-${linha.competenciaAAAMM}</ContasAReceberSerieDocumento>
+<ContasAReceberComentario>${comentario}</ContasAReceberComentario>
+<ContasAReceberUkey/>
+<Parcela>
+<SDTContasAReceberParcela.SDTContasAReceberParcelaItem>
+<ContasAReceberParcelaOrdem>1</ContasAReceberParcelaOrdem>
+<ContasAReceberParcelaVctoNominal>${linha.vencimento}</ContasAReceberParcelaVctoNominal>
+<ContasAReceberParcelaVctoReal>${linha.vencimento}</ContasAReceberParcelaVctoReal>
+<ContasAReceberParcelaValorBruto>${valorTotal.toFixed(2)}</ContasAReceberParcelaValorBruto>
+<ContasAReceberParcelaValorLiquido>${valorTotal.toFixed(2)}</ContasAReceberParcelaValorLiquido>
+<ContasAReceberParcelaMoeda>SMBR</ContasAReceberParcelaMoeda>
+<ContasAReceberParcelaTipoDocumento>${tipoDoc}</ContasAReceberParcelaTipoDocumento>
+<ContasAReceberParcelaCompetencia>${linha.competenciaAAAMM}</ContasAReceberParcelaCompetencia>
+<ContasAReceberParcelaComentario>${comentario}</ContasAReceberParcelaComentario>
+</SDTContasAReceberParcela.SDTContasAReceberParcelaItem>
+</Parcela>
+<Rateio>
+${rateioItems}
+</Rateio>
+<Previsao/>
+</SDTNewRec>`;
+}
+
+// ═══════════════════════════════════════
+// CONFIGURAÇÕES DO PROXY E ONDRIVE
+// ═══════════════════════════════════════
+const PROXY_URL  = 'http://10.130.101.40:3001';
+const WSGA_LOGIN = 'admincsc';
+const WSGA_KEY   = '1956627D5DD6B6AB8668E3D0261FFF91';
+
+const PASTA_ONDRIVE = {
+  '02':'02 - PALLAS','18':'18 - ADM CENTRAL','26':'26 - ASSETUR',
+  '49':'49 - INTERNACIONAL','69':'69 - PRESC FILIAL','71':'71 - VILA SACRA',
+  '81':'81 - SEDE MHS','82':'82 -TORCIDA BRASIL','84':'84 - POP TUR','85':'85 - NEST TRAVEL',
+};
+
+// Chama o proxy — mesmo padrão do Mapa de Posições (action + xml ou dados)
+async function chamarProxy(dados){
+  const resp = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  });
+  if(!resp.ok) throw new Error(`Proxy erro ${resp.status}`);
+  return await resp.json();
+}
+
+// ── PASSO 1: Autentica no StarSoft ──
+// Monta o XML de autenticação e envia via proxy (igual ao Mapa de Posições)
+async function autenticarStarSoft(empresa){
+  const xml = `<?xml version="1.0" encoding="utf-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:met="MetodosWeb" xmlns:wsga="WSGA"><soapenv:Header/><soapenv:Body><WsGaService.AUTENTICALOGIN><Sdtautenticalogin><AppLogin>${WSGA_LOGIN}</AppLogin><AppHost>201.76.181.43</AppHost><AppKey>${WSGA_KEY}</AppKey><AppEmpresa>${empresa}</AppEmpresa></Sdtautenticalogin></WsGaService.AUTENTICALOGIN></soapenv:Body></soapenv:Envelope>`;
+  const res = await chamarProxy({ action: 'AUTENTICALOGIN', xml });
+  if(res.op_status !== '1') throw new Error(res.op_descr || 'Autenticação falhou');
+  return res.op_ukey; // sessionId
+}
+
+// ── PASSO 2: Cria SAD ou REC ──
+async function criarDocumentoViaProxy(sessionId, empresa, soapPayload, tipoServico){
+  // soapPayload já vem completo com a tag SDT (ex: <SDTNewNotaFiscalEntrada>...</SDTNewNotaFiscalEntrada>)
+  // Só envolve no envelope SOAP — igual ao Mapa de Posições
+  const xml = '<?xml version="1.0" encoding="utf-8"?>'
+    + '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:met="MetodosWeb" xmlns:wsga="WSGA">'
+    + '<soapenv:Header/><soapenv:Body>'
+    + '<WsGaService.' + tipoServico + '>'
+    + soapPayload
+    + '</WsGaService.' + tipoServico + '>'
+    + '</soapenv:Body></soapenv:Envelope>';
+  const res = await chamarProxy({ action: tipoServico, xml });
+  if(res.op_status !== '1') throw new Error(res.op_descr || res.error || 'Falha ao criar documento');
+  return { ok: true, codigo: res.op_codigo, ukey: res.op_ukey, numerSad: res.numero_sad || res.op_codigo || res.op_ukey };
+}
+
+// ── PASSO 3: Upload PDF no OneDrive ──
+async function salvarPDFOneDrive(empresa, vencimento, ukey, numerSad){
+  const res = await chamarProxy({
+    action: 'UPLOAD_ONEDRIVE',
+    ukey, numero_sad: numerSad, empresa_cod: empresa, data_vencimento: vencimento,
+  });
+  if(!res.ok && !res.success) throw new Error(res.error || 'Falha no upload OneDrive');
+  return { caminho: res.caminho, numeroFinal: res.numeroFinal };
+}
+// ── ORQUESTRADOR PRINCIPAL ──
+async function executarGerarDocs(){
+  const linhas = coletarLinhas();
+  if(!linhas.length){
+    showToast('⚠️ Preencha pelo menos uma competência e vencimento!','err');
+    return;
+  }
+
+  const e      = EMPRESAS[gerarEmpIdx];
+  const tipos  = ['510','512','511','509'].filter(t => e.crds.some(c=>c.tipo===t));
+  const isSad  = gerarTipoDoc === 'sad';
+
+  const logDiv  = document.getElementById('gerarLog');
+  const logCont = document.getElementById('gerarLogContent');
+  logDiv.style.display = 'block';
+  logCont.innerHTML = '';
+
+  const btn = document.getElementById('btnGerarExecutar');
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+
+  function log(msg, cor='#E2E8F0'){
+    logCont.innerHTML += `<div style="color:${cor};">${msg}</div>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  const total = linhas.length * tipos.length;
+  let sucesso = 0, falha = 0;
+
+  log(`🚀 Iniciando geração de ${total} ${isSad?'SADs':'RECs'} para ${e.cod} ${e.nome}...`, '#7DD3FC');
+  log(`   Proxy: ${PROXY_URL}`, '#64748B');
+  log(`   Pasta OneDrive: ${PASTA_ONDRIVE[e.cod] || e.cod}`, '#64748B');
+  log(`   Competências: ${linhas.map(l=>l.label).join(', ')}`, '#94A3B8');
+  log(`   Tipos: ${tipos.map(t=>TIPO_LABEL[t]).join(' · ')}`, '#94A3B8');
+  log('─'.repeat(62), '#334155');
+
+  // Autentica uma vez por empresa
+  let sessionId;
+  try {
+    log(`\n🔐 Autenticando na empresa ${e.cod} no StarSoft...`, '#94A3B8');
+    sessionId = await autenticarStarSoft(e.cod);
+    log(`   ✅ Session ID: ${sessionId.slice(0,8)}...`, '#86EFAC');
+  } catch(err){
+    log(`\n❌ FALHA NA AUTENTICAÇÃO: ${err.message}`, '#FCA5A5');
+    log(`   Verifique se o proxy está rodando: pm2 status`, '#FCD34D');
+    btn.disabled = false; btn.style.opacity = '1';
+    showToast('❌ Falha na autenticação. Verifique o proxy.','err');
+    return;
+  }
+
+  for(const linha of linhas){
+    log(`\n📅 Competência: <strong style="color:#FCD34D">${linha.label}</strong> · Venc: ${linha.vencimento.split('-').reverse().join('/')}`, '#E2E8F0');
+
+    for(const tipoAtual of tipos){
+      const crdsGrupo  = e.crds.filter(c=>c.tipo===tipoAtual);
+      const valorTotal = crdsGrupo.reduce((s,c)=>s+(c.pessoas||0)*(c.taxa||0),0);
+      if(valorTotal<=0){ log(`  ⏭ ${TIPO_LABEL[tipoAtual]}: sem valor, pulando`, '#475569'); continue; }
+
+      log(`  ⏳ ${TIPO_LABEL[tipoAtual]} — ${R(valorTotal)} — ${crdsGrupo.length} CRD(s)...`, '#94A3B8');
+
+      try {
+        // Monta payload com sessionId real
+        const payload = isSad
+          ? montarPayloadSAD(e, linha, tipoAtual, valorTotal, crdsGrupo, sessionId)
+          : montarPayloadREC(e, linha, tipoAtual, valorTotal, crdsGrupo, sessionId);
+
+        const tipoServico = isSad ? 'NEWNOTAFISCALENTRADA' : 'NEWREC';
+
+        // Cria documento via proxy
+        const res = await criarDocumentoViaProxy(sessionId, e.cod, payload, tipoServico);
+
+        log(`  ✅ <strong style="color:#86EFAC">CRIADO</strong> — Número: <strong style="color:#FCD34D">${res.numerSad || res.codigo}</strong> | UKey: ${res.ukey}`, '#86EFAC');
+        log(`  🔍 op_codigo: ${res.codigo} | op_ukey: ${res.ukey}`, '#64748B');
+        sucesso++;
+
+        // Upload PDF no OneDrive (apenas para SAD)
+        if(isSad){
+          try {
+            log(`  📤 Salvando PDF no OneDrive...`, '#94A3B8');
+            const { caminho, numeroFinal } = await salvarPDFOneDrive(
+              e.cod,
+              linha.vencimento,        // AAAA-MM-DD
+              res.ukey,                // ukey retornado pelo StarSoft
+              res.numerSad || res.codigo
+            );
+            log(`  📁 <strong style="color:#86EFAC">OneDrive OK</strong> — ${caminho}`, '#86EFAC');
+            if(numeroFinal) log(`  🔖 Número real da SAD: <strong style="color:#FCD34D">${numeroFinal}</strong>`, '#E2E8F0');
+          } catch(errPDF){
+            log(`  ⚠️ PDF não salvo no OneDrive: ${errPDF.message}`, '#FCD34D');
+          }
+        }
+
+      } catch(err){
+        falha++;
+        log(`  ❌ <strong style="color:#FCA5A5">FALHA</strong>: ${err.message}`, '#FCA5A5');
+      }
+    }
+  }
+
+  log('\n' + '═'.repeat(62), '#334155');
+  log(`🏁 Concluído: <strong style="color:#86EFAC">${sucesso} criado(s)</strong> · <strong style="color:#FCA5A5">${falha} com falha</strong>`, '#E2E8F0');
+
+  btn.disabled = false;
+  btn.style.opacity = '1';
+
+  if(falha === 0){
+    showToast(`✅ ${sucesso} ${isSad?'SAD(s)':'REC(s)'} criado(s) e salvo(s) no OneDrive!`, 'ok');
+  } else {
+    showToast(`⚠️ ${sucesso} OK · ${falha} com falha. Veja o log.`, '');
+  }
+}
+// ═══════════════════════════════════════
+// TRANSAÇÕES
+// ═══════════════════════════════════════
+
+  // Datas default
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('cfgEmissao').value = todayStr;
+  document.getElementById('cfgCompetencia').value = todayStr;
+  // Vencimento = último dia do mês atual
+  const lastDay = new Date(yyyy, today.getMonth()+1, 0);
+  document.getElementById('cfgVencimento').value =
+    `${yyyy}-${mm}-${String(lastDay.getDate()).padStart(2,'0')}`;
+  // Série default
+  document.getElementById('cfgSerie').value =
+    `${e.cod}-${tipo.toUpperCase()}-${yyyy}${mm}`;
+
+// ═══════════════════════════════════════
+// TRANSAÇÕES
+// ═══════════════════════════════════════
+let filtTr=[...TRANSACOES], pgTr=1; const PS=14;
+
+function filterTr(){
+  const s=document.getElementById('srchIn').value.toLowerCase();
+  const r=document.getElementById('filRat').value;
+  const m=document.getElementById('filMes').value;
+  filtTr=TRANSACOES.filter(t=>{
+    const ms=!s||(t.forn.toLowerCase().includes(s)||t.desc.toLowerCase().includes(s)||t.sad.toLowerCase().includes(s));
+    const mr=!r||t.rat.includes(r);
+    const mm=!m||t.comp===m;
+    return ms&&mr&&mm;
+  });
+  pgTr=1; renderTr();
+}
+function clearFil(){ document.getElementById('srchIn').value=''; document.getElementById('filRat').value=''; document.getElementById('filMes').value=''; filtTr=[...TRANSACOES]; pgTr=1; renderTr(); }
+
+function renderTr(){
+  document.getElementById('trBadge').textContent=filtTr.length;
+  const tv=filtTr.reduce((s,t)=>s+t.val,0);
+  const maxV=filtTr.length?Math.max(...filtTr.map(t=>t.val)):0;
+  document.getElementById('trCards').innerHTML=`
+    <div class="card"><div class="card-lbl">Lançamentos</div><div class="card-val">${filtTr.length}</div><div class="card-sub">de ${TRANSACOES.length} total</div></div>
+    <div class="card cc"><div class="card-lbl">Volume</div><div class="card-val">${RS(tv)}</div></div>
+    <div class="card cv"><div class="card-lbl">Maior Valor</div><div class="card-val">${RS(maxV)}</div></div>
+  `;
+  const st=(pgTr-1)*PS;
+  const sl=filtTr.slice(st,st+PS);
+  document.getElementById('trBody').innerHTML=sl.length?
+    sl.map((t,i)=>`<tr onclick="showTrDetail(${TRANSACOES.indexOf(t)})" style="cursor:pointer;">
+      <td>${FD(t.data)}</td><td class="td-emp">${t.forn}</td>
+      <td><div class="dc" title="${t.desc}">${t.desc}</div></td>
+      <td>${TR(t.rat)}</td>
+      <td>${t.comp?t.comp.slice(0,4)+'/'+t.comp.slice(4):'—'}</td>
+      <td style="text-align:right;" class="vp">${R(t.val)}</td>
+      <td style="font-size:11px;color:var(--cinza);">${t.sad}</td>
+    </tr>`).join(''):
+    `<tr><td colspan="7"><div class="empty"><span>🔍</span>Nenhum lançamento encontrado.</div></td></tr>`;
+  const tp=Math.ceil(filtTr.length/PS);
+  document.getElementById('pgInfo').textContent=`${st+1}–${Math.min(st+PS,filtTr.length)} de ${filtTr.length}`;
+  const pb=document.getElementById('pgBtns');
+  pb.innerHTML=`<button class="pbtn" onclick="goPg(${pgTr-1})" ${pgTr<=1?'disabled':''}>‹</button>`;
+  for(let p=Math.max(1,pgTr-2);p<=Math.min(tp,pgTr+2);p++) pb.innerHTML+=`<button class="pbtn ${p===pgTr?'active':''}" onclick="goPg(${p})">${p}</button>`;
+  pb.innerHTML+=`<button class="pbtn" onclick="goPg(${pgTr+1})" ${pgTr>=tp?'disabled':''}>›</button>`;
+}
+function goPg(p){ const tp=Math.ceil(filtTr.length/PS); if(p<1||p>tp) return; pgTr=p; renderTr(); }
+
+function showTrDetail(i){
+  const t=TRANSACOES[i]; if(!t) return;
+  document.getElementById('mo2body').innerHTML=`
+    <p><strong>Data:</strong> ${FD(t.data)}</p>
+    <p><strong>Fornecedor:</strong> ${t.forn}</p>
+    <p><strong>Descrição:</strong> ${t.desc}</p>
+    <p><strong>Tipo de Rateio:</strong> ${TR(t.rat)}</p>
+    <p><strong>Competência:</strong> ${t.comp?t.comp.slice(0,4)+'/'+t.comp.slice(4):'—'}</p>
+    <p><strong>Valor:</strong> <span class="vp" style="font-size:17px;">${R(t.val)}</span></p>
+    <p><strong>SAD:</strong> <code style="background:#F1F5F9;padding:2px 6px;border-radius:4px;">${t.sad}</code></p>
+  `;
+  document.getElementById('mo2').classList.add('open');
+}
+function closeMo2(e){ if(e.target.id==='mo2') document.getElementById('mo2').classList.remove('open'); }
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══════════════════════════════════════
+// SISTEMA DE AUTENTICAÇÃO
+// ═══════════════════════════════════════
+function hashSenha(s){ let h=0; for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0} return h.toString(36); }
+
+function getUsuarios(){
+  const raw = localStorage.getItem('ctaxas_users');
+  if(raw) return JSON.parse(raw);
+  const defaults = [
+    { user:'cristiano', nome:'Cristiano Uceda', senhaHash: hashSenha('Aguia@2026'), admin: true },
+    { user:'julio',     nome:'Julio Cezar',      senhaHash: hashSenha('Aguia@2026'), admin: false },
+  ];
+  localStorage.setItem('ctaxas_users', JSON.stringify(defaults));
+  return defaults;
+}
+function salvarUsuarios(users){ localStorage.setItem('ctaxas_users', JSON.stringify(users)); }
+function getSessionAtual(){ const s=sessionStorage.getItem('ctaxas_session'); return s?JSON.parse(s):null; }
+
+function fazerLogin(){
+  const user  = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass  = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display='none';
+  if(!user||!pass){ errEl.textContent='Preencha usuário e senha.'; errEl.style.display='block'; return; }
+  const users = getUsuarios();
+  const found = users.find(u=>u.user===user && u.senhaHash===hashSenha(pass));
+  if(!found){ errEl.textContent='Usuário ou senha incorretos.'; errEl.style.display='block'; return; }
+  sessionStorage.setItem('ctaxas_session', JSON.stringify({user:found.user, nome:found.nome, admin:found.admin}));
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('hdrUserName').textContent='👤 '+found.nome.split(' ')[0];
+}
+
+function fazerLogout(){
+  if(!confirm('Deseja sair do sistema?')) return;
+  sessionStorage.removeItem('ctaxas_session');
+  location.reload();
+}
+
+function verificarSessao(){
+  const s=getSessionAtual();
+  if(!s){ document.getElementById('loginScreen').style.display='flex'; }
+  else { document.getElementById('loginScreen').style.display='none'; document.getElementById('hdrUserName').textContent='👤 '+s.nome.split(' ')[0]; }
+}
+
+function abrirUsuarios(){ renderUsuarios(); document.getElementById('moUsers').classList.add('open'); }
+function fecharUsuarios(){ document.getElementById('moUsers').classList.remove('open'); }
+
+function renderUsuarios(){
+  const users=getUsuarios(); const session=getSessionAtual();
+  document.getElementById('usersList').innerHTML=users.map((u,i)=>`
+    <div class="user-row">
+      <div class="user-info">
+        <div class="u-name">${u.nome} <span class="user-badge ${u.admin?'admin':''}">${u.admin?'Admin':'Usuário'}</span></div>
+        <div class="u-email">@${u.user}</div>
+      </div>
+      <div class="u-actions">
+        ${u.user!==session?.user?`<button class="btn-del-user" onclick="removerUsuario(${i})">🗑 Remover</button>`:'<span style="font-size:12px;color:#64748B">Você</span>'}
+      </div>
+    </div>`).join('');
+}
+
+function adicionarUsuario(){
+  const nome=document.getElementById('novoNome').value.trim();
+  const user=document.getElementById('novoUser').value.trim().toLowerCase().replace(/\s/g,'');
+  const senha=document.getElementById('novaSenha').value;
+  const senha2=document.getElementById('novaSenha2').value;
+  if(!nome||!user||!senha){showToast('Preencha todos os campos!','err');return;}
+  if(senha!==senha2){showToast('As senhas não conferem!','err');return;}
+  if(senha.length<6){showToast('Mínimo 6 caracteres na senha!','err');return;}
+  const users=getUsuarios();
+  if(users.find(u=>u.user===user)){showToast('Usuário já existe!','err');return;}
+  users.push({user,nome,senhaHash:hashSenha(senha),admin:false});
+  salvarUsuarios(users); renderUsuarios();
+  document.getElementById('novoNome').value='';
+  document.getElementById('novoUser').value='';
+  document.getElementById('novaSenha').value='';
+  document.getElementById('novaSenha2').value='';
+  showToast('✅ Usuário '+nome+' criado!','ok');
+}
+
+function removerUsuario(idx){
+  const users=getUsuarios();
+  if(!confirm('Remover "'+users[idx].nome+'"?')) return;
+  users.splice(idx,1); salvarUsuarios(users); renderUsuarios();
+  showToast('Usuário removido!','ok');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+document.getElementById('hdrDate').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+verificarSessao();
+renderDashboard();
+renderRateio();
+</script>
+</body>
+</html>
