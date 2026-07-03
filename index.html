@@ -1628,9 +1628,10 @@ async function executarGerarDocs(){
   // Autentica uma vez por empresa
   let sessionId;
   try {
-    log(`\n🔐 Autenticando na empresa ${e.cod} no StarSoft...`, '#94A3B8');
+    const empAuth = isSad ? e.cod : '18';
+    log(`\n🔐 Autenticando na empresa ${empAuth}${!isSad?' (CSC — empresa que emite a REC)':''} no StarSoft...`, '#94A3B8');
     // SAD: autentica na empresa do card / REC: autentica sempre na empresa 18 (CSC)
-    sessionId = await autenticarStarSoft(isSad ? e.cod : '18');
+    sessionId = await autenticarStarSoft(empAuth);
     log(`   ✅ Session ID: ${sessionId.slice(0,8)}...`, '#86EFAC');
   } catch(err){
     log(`\n❌ FALHA NA AUTENTICAÇÃO: ${err.message}`, '#FCA5A5');
@@ -1658,8 +1659,12 @@ async function executarGerarDocs(){
 
         const tipoServico = isSad ? 'NEWNOTAFISCALENTRADA' : 'NEWREC';
 
-        // Cria documento via proxy
-        const res = await criarDocumentoViaProxy(sessionId, e.cod, payload, tipoServico);
+        // Log do início do payload para debug
+        log(`  📋 Payload (100 chars): ${payload.slice(0,100)}...`, '#475569');
+
+        // Cria documento via proxy — REC sempre na empresa 18
+        const empresaDoc = isSad ? e.cod : '18';
+        const res = await criarDocumentoViaProxy(sessionId, empresaDoc, payload, tipoServico);
 
         log(`  ✅ <strong style="color:#86EFAC">CRIADO</strong> — Número: <strong style="color:#FCD34D">${res.numerSad || res.codigo}</strong> | UKey: ${res.ukey}`, '#86EFAC');
         log(`  🔍 op_codigo: ${res.codigo} | op_ukey: ${res.ukey}`, '#64748B');
