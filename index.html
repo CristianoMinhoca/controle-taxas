@@ -1450,9 +1450,11 @@ function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   const serie    = e.cod + '-REC-' + tipoRateio + '-' + linha.competenciaAAAMM;
   const coment   = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
 
-  // REC: rateio sempre 100% no CRD fixo 18.205.0004
+  // REC: CRD fixo por TD (mesmo para todas as empresas)
+  const CRD_POR_TD = { '510':'182050004', '512':'182050003', '511':'182050002', '509':'182050001' };
+  const crdRec = CRD_POR_TD[tipoRateio] || '182050004';
   const rateioXml = '<SDTContasAReceberRateio.SDTContasAReceberRateioItem>'
-    + '<ContasAReceberRateioCRDCod>182050004</ContasAReceberRateioCRDCod>'
+    + '<ContasAReceberRateioCRDCod>'+crdRec+'</ContasAReceberRateioCRDCod>'
     + '<ContasAReceberRateioPercentual>100.000000</ContasAReceberRateioPercentual>'
     + '<ContasAReceberRateioValor>'+valorTotal.toFixed(2)+'</ContasAReceberRateioValor>'
     + '</SDTContasAReceberRateio.SDTContasAReceberRateioItem>';
