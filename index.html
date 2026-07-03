@@ -770,10 +770,10 @@ let EMPRESAS = [
 
   // ── 84 POP TUR ── 6 pessoas ──────────────────────────────────────────────
   { cod:'84', nome:'Pop Tur', icon:'🎭', crds:[
-    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'510', taxa:650},
-    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'512', taxa:275},
-    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'511', taxa:202.32},
-    {crd:'84.001.0001',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'509', taxa:850},
+    {crd:'18.205.0004',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'510', taxa:650},
+    {crd:'18.205.0004',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'512', taxa:275},
+    {crd:'18.205.0004',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'511', taxa:202.32},
+    {crd:'18.205.0004',dept:'DESPESAS ADMINISTRATIVAS', pessoas:6, tipo:'509', taxa:850},
   ]},
 ];
 
@@ -1450,24 +1450,12 @@ function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   const serie    = e.cod + '-REC-' + tipoRateio + '-' + linha.competenciaAAAMM;
   const coment   = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
 
-  // CRDs SEM PONTOS no rateio (mesmo padrão da SAD)
-  let somaPerc = 0;
-  const rateioXml = crdsGrupo.map((c, idx) => {
-    const val = (c.pessoas||0)*(c.taxa||0);
-    let pct;
-    if(idx === crdsGrupo.length - 1){
-      pct = (100.0 - somaPerc).toFixed(6);
-    } else {
-      pct = valorTotal > 0 ? (val/valorTotal*100).toFixed(6) : '0.000000';
-      somaPerc += parseFloat(pct);
-    }
-    const crdSemPontos = c.crd.replace(/\./g,'');
-    return '<SDTContasAReceberRateio.SDTContasAReceberRateioItem>'
-      + '<ContasAReceberRateioCRDCod>'+crdSemPontos+'</ContasAReceberRateioCRDCod>'
-      + '<ContasAReceberRateioPercentual>'+pct+'</ContasAReceberRateioPercentual>'
-      + '<ContasAReceberRateioValor>'+val.toFixed(2)+'</ContasAReceberRateioValor>'
-      + '</SDTContasAReceberRateio.SDTContasAReceberRateioItem>';
-  }).join('');
+  // REC: rateio sempre 100% no CRD fixo 18.205.0004
+  const rateioXml = '<SDTContasAReceberRateio.SDTContasAReceberRateioItem>'
+    + '<ContasAReceberRateioCRDCod>182050004</ContasAReceberRateioCRDCod>'
+    + '<ContasAReceberRateioPercentual>100.000000</ContasAReceberRateioPercentual>'
+    + '<ContasAReceberRateioValor>'+valorTotal.toFixed(2)+'</ContasAReceberRateioValor>'
+    + '</SDTContasAReceberRateio.SDTContasAReceberRateioItem>';
 
   // REC sempre criada na empresa 18 (CSC)
   // Cliente = empresa devedora; Vila Sacra é Internacional
