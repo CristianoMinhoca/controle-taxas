@@ -1444,79 +1444,77 @@ function montarPayloadSAD(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
 
 // Monta XML do payload REC (NEWREC)
 function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId){
-  const session  = sessionId || document.getElementById('wsgaSession').value || '';
-  const ukeyOri  = document.getElementById('wsgaUkey').value || '';
-  const tipoDoc  = document.getElementById('wsgaTipoDoc').value || 'TD-0000081';
+  const TD_MAP = { '509':'TD-0000509','510':'TD-0000510','511':'TD-0000511','512':'TD-0000512' };
+  const tipoDoc  = TD_MAP[tipoRateio] || 'TD-0000509';
+  const clienteCod = CLIENTE_COD[e.cod] || '';
+  const serie    = e.cod + '-REC-' + tipoRateio + '-' + linha.competenciaAAAMM;
+  const coment   = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
 
-  const rateioItems = crdsGrupo.map(c=>{
+  // CRDs SEM PONTOS no rateio (mesmo padrão da SAD)
+  let somaPerc = 0;
+  const rateioXml = crdsGrupo.map((c, idx) => {
     const val = (c.pessoas||0)*(c.taxa||0);
-    const pct = valorTotal>0 ? (val/valorTotal*100).toFixed(6) : '0.000000';
-    return `<SDTContasAReceberRateio.SDTContasAReceberRateioItem>
-<ContasAReceberRateioCRDCod>${c.crd}</ContasAReceberRateioCRDCod>
-<ContasAReceberRateioPercentual>${pct}</ContasAReceberRateioPercentual>
-<ContasAReceberRateioValor>${val.toFixed(2)}</ContasAReceberRateioValor>
-</SDTContasAReceberRateio.SDTContasAReceberRateioItem>`;
-  }).join('\n');
+    let pct;
+    if(idx === crdsGrupo.length - 1){
+      pct = (100.0 - somaPerc).toFixed(6);
+    } else {
+      pct = valorTotal > 0 ? (val/valorTotal*100).toFixed(6) : '0.000000';
+      somaPerc += parseFloat(pct);
+    }
+    const crdSemPontos = c.crd.replace(/\./g,'');
+    return '<SDTContasAReceberRateio.SDTContasAReceberRateioItem>'
+      + '<ContasAReceberRateioCRDCod>'+crdSemPontos+'</ContasAReceberRateioCRDCod>'
+      + '<ContasAReceberRateioPercentual>'+pct+'</ContasAReceberRateioPercentual>'
+      + '<ContasAReceberRateioValor>'+val.toFixed(2)+'</ContasAReceberRateioValor>'
+      + '</SDTContasAReceberRateio.SDTContasAReceberRateioItem>';
+  }).join('');
 
-  const comentario = `<![CDATA[Rateio ${TIPO_LABEL[tipoRateio]} — ${e.cod} ${e.nome} — Competência ${linha.label}]]>`;
-
-  return `<SDTNewRec>
-<SessionId>${session}</SessionId>
-<ContasAReceberEmpresa>${e.cod}</ContasAReceberEmpresa>
-<ContasAReceberCod/>
-<ContasAReceberOrigem>C</ContasAReceberOrigem>
-<ContasAReceberCodOrigem/>
-<ContasAReceberCnpjOrigem/>
-<ContasAReceberUkeyOrigem>${ukeyOri}</ContasAReceberUkeyOrigem>
-<ContasAReceberOrigemNomeFantasia/>
-<ContasAReceberOrigemRazaoSocial/>
-<ContasAReceberOrigemOrigem/>
-<ContasAReceberOrigemTipoPessoa/>
-<ContasAReceberOrigemEndereco/>
-<ContasAReceberOrigemComplemento/>
-<ContasAReceberOrigemNumero/>
-<ContasAReceberOrigemCep/>
-<ContasAReceberOrigemBairro/>
-<ContasAReceberOrigemPais/>
-<ContasAReceberOrigemEstado/>
-<ContasAReceberOrigemCidade/>
-<ContasAReceberOrigemDDD/>
-<ContasAReceberOrigemTelefone/>
-<ContasAReceberOrigemContato/>
-<ContasAReceberOrigemFax/>
-<ContasAReceberOrigemEmail/>
-<ContasAReceberOrigemwww/>
-<ContasAReceberOrigemTipo/>
-<ContasAReceberOrigemClassificacao>0</ContasAReceberOrigemClassificacao>
-<ContasAReceberOrigemInscricao/>
-<ContasAReceberOrigemCCM/>
-<ContasAReceberOrigemRamal/>
-<ContasAReceberMoeda>SMBR</ContasAReceberMoeda>
-<ContasAReceberTipoDocumento>${tipoDoc}</ContasAReceberTipoDocumento>
-<ContasAReceberCompetencia>${linha.competenciaAAAMM}</ContasAReceberCompetencia>
-<ContasAReceberValorTotal>${valorTotal.toFixed(2)}</ContasAReceberValorTotal>
-<ContasAReceberQtdParcela>1</ContasAReceberQtdParcela>
-<ContasAReceberSerieDocumento>${e.cod}-${tipoRateio}-${linha.competenciaAAAMM}</ContasAReceberSerieDocumento>
-<ContasAReceberComentario>${comentario}</ContasAReceberComentario>
-<ContasAReceberUkey/>
-<Parcela>
-<SDTContasAReceberParcela.SDTContasAReceberParcelaItem>
-<ContasAReceberParcelaOrdem>1</ContasAReceberParcelaOrdem>
-<ContasAReceberParcelaVctoNominal>${linha.vencimento}</ContasAReceberParcelaVctoNominal>
-<ContasAReceberParcelaVctoReal>${linha.vencimento}</ContasAReceberParcelaVctoReal>
-<ContasAReceberParcelaValorBruto>${valorTotal.toFixed(2)}</ContasAReceberParcelaValorBruto>
-<ContasAReceberParcelaValorLiquido>${valorTotal.toFixed(2)}</ContasAReceberParcelaValorLiquido>
-<ContasAReceberParcelaMoeda>SMBR</ContasAReceberParcelaMoeda>
-<ContasAReceberParcelaTipoDocumento>${tipoDoc}</ContasAReceberParcelaTipoDocumento>
-<ContasAReceberParcelaCompetencia>${linha.competenciaAAAMM}</ContasAReceberParcelaCompetencia>
-<ContasAReceberParcelaComentario>${comentario}</ContasAReceberParcelaComentario>
-</SDTContasAReceberParcela.SDTContasAReceberParcelaItem>
-</Parcela>
-<Rateio>
-${rateioItems}
-</Rateio>
-<Previsao/>
-</SDTNewRec>`;
+  // REC sempre criada na empresa 18 (CSC)
+  // Cliente = empresa devedora (código do StarSoft)
+  return '<Sdtnewrec>'
+    + '<SessionId>'+sessionId+'</SessionId>'
+    + '<ContasAReceberEmpresa>18</ContasAReceberEmpresa>'
+    + '<ContasAReceberCod></ContasAReceberCod>'
+    + '<ContasAReceberOrigem>C</ContasAReceberOrigem>'
+    + '<ContasAReceberCodOrigem>'+clienteCod+'</ContasAReceberCodOrigem>'
+    + '<ContasAReceberCnpjOrigem></ContasAReceberCnpjOrigem>'
+    + '<ContasAReceberUkeyOrigem></ContasAReceberUkeyOrigem>'
+    + '<ContasAReceberOrigemNomeFantasia></ContasAReceberOrigemNomeFantasia>'
+    + '<ContasAReceberOrigemRazaoSocial></ContasAReceberOrigemRazaoSocial>'
+    + '<ContasAReceberOrigemOrigem>N</ContasAReceberOrigemOrigem>'
+    + '<ContasAReceberOrigemTipoPessoa>J</ContasAReceberOrigemTipoPessoa>'
+    + '<ContasAReceberOrigemEndereco></ContasAReceberOrigemEndereco>'
+    + '<ContasAReceberOrigemCep></ContasAReceberOrigemCep>'
+    + '<ContasAReceberOrigemCidade></ContasAReceberOrigemCidade>'
+    + '<ContasAReceberOrigemTipo>CLI</ContasAReceberOrigemTipo>'
+    + '<ContasAReceberOrigemClassificacao>2</ContasAReceberOrigemClassificacao>'
+    + '<ContasAReceberMoeda>SMBR</ContasAReceberMoeda>'
+    + '<ContasAReceberTipoDocumento>'+tipoDoc+'</ContasAReceberTipoDocumento>'
+    + '<ContasAReceberCompetencia>'+linha.competenciaAAAMM+'</ContasAReceberCompetencia>'
+    + '<ContasAReceberValorTotal>'+valorTotal.toFixed(2)+'</ContasAReceberValorTotal>'
+    + '<ContasAReceberQtdParcela>1</ContasAReceberQtdParcela>'
+    + '<ContasAReceberSerieDocumento>'+serie+'</ContasAReceberSerieDocumento>'
+    + '<ContasAReceberFaturaFornecedor></ContasAReceberFaturaFornecedor>'
+    + '<ContasAReceberComentario><![CDATA['+coment+']]></ContasAReceberComentario>'
+    + '<ContasAReceberUkey></ContasAReceberUkey>'
+    + '<Parcela>'
+    + '<SDTContasAReceberParcela.SDTContasAReceberParcelaItem>'
+    + '<ContasAReceberParcelaOrdem>1</ContasAReceberParcelaOrdem>'
+    + '<ContasAReceberParcelaVctoNominal>'+linha.vencimento+'</ContasAReceberParcelaVctoNominal>'
+    + '<ContasAReceberParcelaVctoReal>'+linha.vencimento+'</ContasAReceberParcelaVctoReal>'
+    + '<ContasAReceberParcelaValorBruto>'+valorTotal.toFixed(2)+'</ContasAReceberParcelaValorBruto>'
+    + '<ContasAReceberParcelaValorLiquido>'+valorTotal.toFixed(2)+'</ContasAReceberParcelaValorLiquido>'
+    + '<ContasAReceberParcelaMoeda>SMBR</ContasAReceberParcelaMoeda>'
+    + '<ContasAReceberParcelaTipoDocumento>'+tipoDoc+'</ContasAReceberParcelaTipoDocumento>'
+    + '<ContasAReceberParcelaCompetencia>'+linha.competenciaAAAMM+'</ContasAReceberParcelaCompetencia>'
+    + '<ContasAReceberParcelaComentario><![CDATA['+coment+']]></ContasAReceberParcelaComentario>'
+    + '</SDTContasAReceberParcela.SDTContasAReceberParcelaItem>'
+    + '</Parcela>'
+    + '<Rateio>'
+    + rateioXml
+    + '</Rateio>'
+    + '<Previsao></Previsao>'
+    + '</Sdtnewrec>';
 }
 
 // ═══════════════════════════════════════
@@ -1525,6 +1523,20 @@ ${rateioItems}
 const PROXY_URL  = 'http://10.130.101.40:3001';
 const WSGA_LOGIN = 'admincsc';
 const WSGA_KEY   = '1956627D5DD6B6AB8668E3D0261FFF91';
+
+// Código do cliente/fornecedor no StarSoft para geração de REC
+const CLIENTE_COD = {
+  '02': 'F1456',
+  '18': '06744',
+  '26': '00711',
+  '49': '280725',
+  '69': '46083669225',
+  '71': '849525695729',
+  '81': '322655534899',
+  '82': '300276325487',
+  '84': '00711',
+  '85': '567441376181',
+};
 
 const PASTA_ONDRIVE = {
   '02':'02 - PALLAS','18':'18 - ADM CENTRAL','26':'26 - ASSETUR',
@@ -1617,7 +1629,8 @@ async function executarGerarDocs(){
   let sessionId;
   try {
     log(`\n🔐 Autenticando na empresa ${e.cod} no StarSoft...`, '#94A3B8');
-    sessionId = await autenticarStarSoft(e.cod);
+    // SAD: autentica na empresa do card / REC: autentica sempre na empresa 18 (CSC)
+    sessionId = await autenticarStarSoft(isSad ? e.cod : '18');
     log(`   ✅ Session ID: ${sessionId.slice(0,8)}...`, '#86EFAC');
   } catch(err){
     log(`\n❌ FALHA NA AUTENTICAÇÃO: ${err.message}`, '#FCA5A5');
