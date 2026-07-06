@@ -1720,6 +1720,28 @@ async function executarGerarDocs(){
         log(`  🔍 op_codigo: ${res.codigo} | op_ukey: ${res.ukey}`, '#64748B');
         sucesso++;
 
+        // ── Grava automaticamente no Controle SAD / REC ──
+        try {
+          const tipoCtrl = isSad ? 'sad' : 'rec';
+          // Mês: competencia = AAAAMM → índice 0-11
+          const compStr = linha.competenciaAAAMM || '';
+          const mesIdx  = compStr.length === 6 ? parseInt(compStr.slice(4,6), 10) - 1 : -1;
+          // Empresa: busca chave no SAD_DATA/REC_DATA pelo cod da empresa
+          const dataCtrl = isSad ? SAD_DATA : REC_DATA;
+          const empKey   = Object.keys(dataCtrl).find(k => k.startsWith(e.cod + ' ') || k.startsWith(e.cod));
+          // Campo: TD → campo
+          const TD_CAMPO = {'510':'juridica','512':'esg','511':'beneficios','509':'pessoas'};
+          const campo = TD_CAMPO[tipoAtual];
+          if(mesIdx >= 0 && mesIdx <= 11 && empKey && campo){
+            const chave = `${tipoCtrl}|${empKey}|${campo}|${mesIdx}`;
+            MANUAL_VALS[chave] = valorTotal;
+            saveManual();
+            log(`  📊 Controle ${tipoCtrl.toUpperCase()} atualizado — ${empKey} · ${campo} · mês ${mesIdx+1}`, '#818CF8');
+          }
+        } catch(errCtrl){
+          log(`  ⚠️ Não foi possível atualizar o controle: ${errCtrl.message}`, '#FCD34D');
+        }
+
         // Upload PDF no OneDrive (apenas para SAD)
         if(isSad){
           try {
