@@ -1271,11 +1271,17 @@ function buildCtrl(tipo){
         const td=row.insertCell(); td.style.textAlign='right';
         const v = getVal(tipo, em, k, i, baseVal);
         if(v !== null){
-          td.textContent=R(v); sub[i]+=v; grand[i]+=v; tot+=v;
-          // célula editável: clique abre input
-          td.style.cursor='pointer';
-          td.title='Clique para editar';
-          td.onclick=()=>abrirInputManual(td,tipo,em,k,i,baseVal);
+          const docNum = MANUAL_VALS[`${tipo}|${em}|${k}|${i}|doc`] || '';
+          td.textContent = R(v);
+          sub[i] += v; grand[i] += v; tot += v;
+          td.style.cursor = 'pointer';
+          if(docNum){
+            td.title = `📄 ${docNum}`;
+            td.style.borderBottom = '1.5px dashed #2563EB';
+          } else {
+            td.title = 'Clique para editar';
+          }
+          td.onclick = ()=>abrirInputManual(td,tipo,em,k,i,baseVal);
         } else {
           // célula vazia: mostra botão de inserir
           td.innerHTML=`<span class="dash" title="Clique para inserir valor" style="cursor:pointer;color:#2563EB;font-weight:700;" onclick="abrirInputManual(this.parentElement,'${tipo}','${em}','${k}',${i},null)">＋</span>`;
@@ -1768,6 +1774,9 @@ async function executarGerarDocs(){
           if(mesIdx >= 0 && mesIdx <= 11 && empKey && campo){
             const chave = `${tipoCtrl}|${empKey}|${campo}|${mesIdx}`;
             MANUAL_VALS[chave] = valorTotal;
+            // Salva também o número do documento para tooltip
+            const chaveDoc = `${tipoCtrl}|${empKey}|${campo}|${mesIdx}|doc`;
+            MANUAL_VALS[chaveDoc] = res.codigo || res.numerSad || res.ukey || '';
             await saveManual();
             log(`  📊 Controle ${tipoCtrl.toUpperCase()} atualizado — ${empKey} · ${campo} · mês ${mesIdx+1}`, '#818CF8');
           }
