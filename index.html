@@ -887,8 +887,8 @@ function showTab(id,btn){
   document.getElementById('sec-'+id).classList.add('active');
   if(id==='dashboard') renderDashboard();
   if(id==='rateio') renderRateio();
-  if(id==='controle-sad') buildCtrl('sad');
-  if(id==='controle-rec') buildCtrl('rec');
+  if(id==='controle-sad') loadManual().then(()=>buildCtrl('sad'));
+  if(id==='controle-rec') loadManual().then(()=>buildCtrl('rec'));
   if(id==='transacoes') renderTr();
 }
 
@@ -1179,8 +1179,30 @@ function closeMoCRDBtn(){ document.getElementById('moCRD').classList.remove('ope
 // CONTROLE SAD/REC TABLE
 // ═══════════════════════════════════════
 // Armazena valores manuais: chave = "tipo|emp|campo|mesIdx"
-const MANUAL_VALS = JSON.parse(localStorage.getItem('ctrlManualVals')||'{}');
-function saveManual(){ localStorage.setItem('ctrlManualVals', JSON.stringify(MANUAL_VALS)); }
+// Storage compartilhado — todos os usuários veem os mesmos dados
+let MANUAL_VALS = {};
+let _storageReady = false;
+
+async function loadManual(){
+  try {
+    const r = await window.storage.get('ctrlManualVals', true);
+    MANUAL_VALS = r ? JSON.parse(r.value) : {};
+  } catch(e){ MANUAL_VALS = {}; }
+  _storageReady = true;
+}
+
+async function saveManual(){
+  try {
+    await window.storage.set('ctrlManualVals', JSON.stringify(MANUAL_VALS), true);
+  } catch(e){ console.warn('storage error', e); }
+}
+
+loadManual().then(() => {
+  if(document.getElementById('sec-controle-sad') &&
+     document.getElementById('sec-controle-sad').style.display !== 'none') buildCtrl('sad');
+  if(document.getElementById('sec-controle-rec') &&
+     document.getElementById('sec-controle-rec').style.display !== 'none') buildCtrl('rec');
+});
 
 function getVal(tipo, em, k, i, baseVal){
   const key = `${tipo}|${em}|${k}|${i}`;
@@ -1200,14 +1222,14 @@ function abrirInputManual(td, tipo, em, k, i, baseVal){
     if(e.key==='Enter'){ inp.blur(); }
     if(e.key==='Escape'){ buildCtrl(tipo); }
   };
-  inp.onblur = () => {
+  inp.onblur = async () => {
     const v = parseFloat(inp.value);
     if(!isNaN(v) && v >= 0){
       MANUAL_VALS[`${tipo}|${em}|${k}|${i}`] = v;
     } else {
       delete MANUAL_VALS[`${tipo}|${em}|${k}|${i}`];
     }
-    saveManual();
+    await saveManual();
     buildCtrl(tipo);
   };
   td.appendChild(inp);
@@ -1735,7 +1757,7 @@ async function executarGerarDocs(){
           if(mesIdx >= 0 && mesIdx <= 11 && empKey && campo){
             const chave = `${tipoCtrl}|${empKey}|${campo}|${mesIdx}`;
             MANUAL_VALS[chave] = valorTotal;
-            saveManual();
+            await saveManual();
             log(`  📊 Controle ${tipoCtrl.toUpperCase()} atualizado — ${empKey} · ${campo} · mês ${mesIdx+1}`, '#818CF8');
           }
         } catch(errCtrl){
