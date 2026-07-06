@@ -1178,17 +1178,46 @@ function closeMoCRDBtn(){ document.getElementById('moCRD').classList.remove('ope
 // ═══════════════════════════════════════
 // CONTROLE SAD/REC TABLE
 // ═══════════════════════════════════════
+// Armazena valores manuais: chave = "tipo|emp|campo|mesIdx"
+const MANUAL_VALS = JSON.parse(localStorage.getItem('ctrlManualVals')||'{}');
+function saveManual(){ localStorage.setItem('ctrlManualVals', JSON.stringify(MANUAL_VALS)); }
+
+function getVal(tipo, em, k, i, baseVal){
+  const key = `${tipo}|${em}|${k}|${i}`;
+  return (key in MANUAL_VALS) ? MANUAL_VALS[key] : (typeof baseVal==='number' ? baseVal : null);
+}
+
+function abrirInputManual(td, tipo, em, k, i, baseVal){
+  const atual = getVal(tipo, em, k, i, baseVal);
+  td.innerHTML = '';
+  const inp = document.createElement('input');
+  inp.type = 'number';
+  inp.min = '0';
+  inp.step = '0.01';
+  inp.value = atual !== null ? atual : '';
+  inp.style.cssText = 'width:100px;padding:3px 5px;border:1.5px solid #2563EB;border-radius:5px;font-size:12px;text-align:right;';
+  inp.onkeydown = e => {
+    if(e.key==='Enter'){ inp.blur(); }
+    if(e.key==='Escape'){ buildCtrl(tipo); }
+  };
+  inp.onblur = () => {
+    const v = parseFloat(inp.value);
+    if(!isNaN(v) && v >= 0){
+      MANUAL_VALS[`${tipo}|${em}|${k}|${i}`] = v;
+    } else {
+      delete MANUAL_VALS[`${tipo}|${em}|${k}|${i}`];
+    }
+    saveManual();
+    buildCtrl(tipo);
+  };
+  td.appendChild(inp);
+  inp.focus();
+  inp.select();
+}
+
 function buildCtrl(tipo){
   const data = tipo==='sad' ? SAD_DATA : REC_DATA;
   const emps = Object.keys(data);
-  let totJ=0,totMes=0;
-  emps.forEach(em=>{ const d=data[em]; ['juridica','esg','beneficios','pessoas'].forEach(k=>{ const v=d[k][0]; if(typeof v==='number') totJ+=v; d[k].forEach(m=>{ if(typeof m==='number') totMes+=m; }); }); });
-  const cardId = tipo==='sad' ? 'sadCards' : 'recCards';
-  document.getElementById(cardId).innerHTML=`
-    <div class="card"><div class="card-lbl">Janeiro 2026</div><div class="card-val">${RS(totJ)}</div><div class="card-sub">Primeiro mês</div></div>
-    <div class="card cc"><div class="card-lbl">Total Acumulado (Jan–Jun)</div><div class="card-val">${RS(totMes)}</div></div>
-    <div class="card"><div class="card-lbl">Empresas</div><div class="card-val">${emps.length}</div></div>
-  `;
   const lbls={juridica:'Jurídica &amp; Infr.',esg:'ESG',beneficios:'Benefícios',pessoas:'Pessoas e Cultura'};
   const tblId = tipo==='sad' ? 'sadTbl' : 'recTbl';
   const tbl = document.getElementById(tblId);
@@ -1203,12 +1232,21 @@ function buildCtrl(tipo){
     let sub=Array(12).fill(0);
     ['juridica','esg','beneficios','pessoas'].forEach(k=>{
       const row=tbody.insertRow();
-      const tot=d[k].reduce((s,v)=>s+(typeof v==='number'?v:0),0);
       row.insertCell().innerHTML=`<span style="padding-left:14px;">${lbls[k]}</span>`;
-      d[k].forEach((v,i)=>{
+      let tot=0;
+      d[k].forEach((baseVal,i)=>{
         const td=row.insertCell(); td.style.textAlign='right';
-        if(typeof v==='number'){td.textContent=R(v);sub[i]+=v;grand[i]+=v;}
-        else td.innerHTML=`<span class="dash">—</span>`;
+        const v = getVal(tipo, em, k, i, baseVal);
+        if(v !== null){
+          td.textContent=R(v); sub[i]+=v; grand[i]+=v; tot+=v;
+          // célula editável: clique abre input
+          td.style.cursor='pointer';
+          td.title='Clique para editar';
+          td.onclick=()=>abrirInputManual(td,tipo,em,k,i,baseVal);
+        } else {
+          // célula vazia: mostra botão de inserir
+          td.innerHTML=`<span class="dash" title="Clique para inserir valor" style="cursor:pointer;color:#2563EB;font-weight:700;" onclick="abrirInputManual(this.parentElement,'${tipo}','${em}','${k}',${i},null)">＋</span>`;
+        }
       });
       const tc=row.insertCell(); tc.style.cssText='text-align:right;font-weight:700;';tc.textContent=tot>0?R(tot):'';
     });
@@ -1221,6 +1259,14 @@ function buildCtrl(tipo){
   const gtd=tr.insertCell(); gtd.textContent='🏆 TOTAL GERAL';
   grand.forEach(v=>{ const td=tr.insertCell(); td.style.textAlign='right'; td.textContent=v>0?R(v):''; });
   const gtot=grand.reduce((a,b)=>a+b,0); const gc=tr.insertCell(); gc.style.textAlign='right'; gc.textContent=R(gtot);
+  // Atualiza cards
+  const totJ=grand[0]||0; const totMes=grand.reduce((a,b)=>a+b,0);
+  const cardId = tipo==='sad' ? 'sadCards' : 'recCards';
+  document.getElementById(cardId).innerHTML=`
+    <div class="card"><div class="card-lbl">Janeiro 2026</div><div class="card-val">${RS(totJ)}</div><div class="card-sub">Primeiro mês</div></div>
+    <div class="card cc"><div class="card-lbl">Total Acumulado</div><div class="card-val">${RS(totMes)}</div></div>
+    <div class="card"><div class="card-lbl">Empresas</div><div class="card-val">${emps.length}</div></div>
+  `;
 }
 
 // ═══════════════════════════════════════
