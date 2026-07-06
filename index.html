@@ -1179,22 +1179,33 @@ function closeMoCRDBtn(){ document.getElementById('moCRD').classList.remove('ope
 // CONTROLE SAD/REC TABLE
 // ═══════════════════════════════════════
 // Armazena valores manuais: chave = "tipo|emp|campo|mesIdx"
-// Storage compartilhado — todos os usuários veem os mesmos dados
+// Storage compartilhado via JSONBin — todos os usuários veem os mesmos dados
+const JSONBIN_ID  = '6a4bd0a3da38895dfe360b3d';
+const JSONBIN_KEY = '$2a$10$/Pvh9UlKZ7ABRi4we3HLzuci8h9s83kcsZV5rscV6liW1FYCkiUuW';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
 let MANUAL_VALS = {};
 let _storageReady = false;
 
 async function loadManual(){
   try {
-    const r = await window.storage.get('ctrlManualVals', true);
-    MANUAL_VALS = r ? JSON.parse(r.value) : {};
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const j = await r.json();
+    MANUAL_VALS = j.record || {};
   } catch(e){ MANUAL_VALS = {}; }
   _storageReady = true;
 }
 
 async function saveManual(){
   try {
-    await window.storage.set('ctrlManualVals', JSON.stringify(MANUAL_VALS), true);
-  } catch(e){ console.warn('storage error', e); }
+    await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify(MANUAL_VALS)
+    });
+  } catch(e){ console.warn('JSONBin save error', e); }
 }
 
 loadManual().then(() => {
