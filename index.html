@@ -1776,7 +1776,7 @@ async function executarGerarDocs(){
             MANUAL_VALS[chave] = valorTotal;
             // Salva também o número do documento para tooltip
             const chaveDoc = `${tipoCtrl}|${empKey}|${campo}|${mesIdx}|doc`;
-            MANUAL_VALS[chaveDoc] = res.codigo || res.numerSad || res.ukey || '';
+            MANUAL_VALS[chaveDoc] = res.numerSad || res.codigo || res.ukey || '';
             await saveManual();
             log(`  📊 Controle ${tipoCtrl.toUpperCase()} atualizado — ${empKey} · ${campo} · mês ${mesIdx+1}`, '#818CF8');
           }
@@ -1795,7 +1795,22 @@ async function executarGerarDocs(){
               res.numerSad || res.codigo
             );
             log(`  📁 <strong style="color:#86EFAC">OneDrive OK</strong> — ${caminho}`, '#86EFAC');
-            if(numeroFinal) log(`  🔖 Número real da SAD: <strong style="color:#FCD34D">${numeroFinal}</strong>`, '#E2E8F0');
+            if(numeroFinal){
+              log(`  🔖 Número real da SAD: <strong style="color:#FCD34D">${numeroFinal}</strong>`, '#E2E8F0');
+              // Atualiza o número real da SAD no controle (sobrescreve o op_codigo)
+              try {
+                const dataCtrl2 = SAD_DATA;
+                const empKey2 = Object.keys(dataCtrl2).find(k => k.startsWith(e.cod + ' ') || k.startsWith(e.cod));
+                const TD_CAMPO2 = {'510':'juridica','512':'esg','511':'beneficios','509':'pessoas'};
+                const campo2 = TD_CAMPO2[tipoAtual];
+                const compStr2 = linha.competenciaAAAMM || '';
+                const mesIdx2 = compStr2.length === 6 ? parseInt(compStr2.slice(4,6), 10) - 1 : -1;
+                if(empKey2 && campo2 && mesIdx2 >= 0){
+                  MANUAL_VALS[`sad|${empKey2}|${campo2}|${mesIdx2}|doc`] = numeroFinal;
+                  await saveManual();
+                }
+              } catch(e2){}
+            }
           } catch(errPDF){
             log(`  ⚠️ PDF não salvo no OneDrive: ${errPDF.message}`, '#FCD34D');
           }
