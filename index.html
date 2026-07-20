@@ -1547,11 +1547,13 @@ function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   // REC sempre criada na empresa 18 (CSC)
   // Cliente = empresa devedora; Vila Sacra é Internacional
   const origemPais = (e.cod === '71') ? 'I' : 'N';
+  // Pop Tur (84) é Cliente, demais são Fornecedores
+  const origemTipo = (e.cod === '84') ? 'C' : 'F';
   return '<Sdtnewrec>'
     + '<SessionId>'+sessionId+'</SessionId>'
     + '<ContasAReceberEmpresa>18</ContasAReceberEmpresa>'
     + '<ContasAReceberCod></ContasAReceberCod>'
-    + '<ContasAReceberOrigem>C</ContasAReceberOrigem>'
+    + '<ContasAReceberOrigem>'+origemTipo+'</ContasAReceberOrigem>'
     + '<ContasAReceberCodOrigem></ContasAReceberCodOrigem>'
     + '<ContasAReceberCnpjOrigem></ContasAReceberCnpjOrigem>'
     + '<ContasAReceberUkeyOrigem>'+clienteCod+'</ContasAReceberUkeyOrigem>'
