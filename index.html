@@ -1547,13 +1547,18 @@ function montarPayloadREC(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   // REC sempre criada na empresa 18 (CSC)
   // Cliente = empresa devedora; Vila Sacra é Internacional
   const origemPais = (e.cod === '71') ? 'I' : 'N';
+  // Códigos curtos = código interno StarSoft (CodOrigem)
+  // Códigos longos (11+ dígitos numéricos) = CNPJ (CnpjOrigem)
+  const isCnpj = /^\d{11,}$/.test(clienteCod);
+  const codOrigem  = isCnpj ? '' : clienteCod;
+  const cnpjOrigem = isCnpj ? clienteCod : '';
   return '<Sdtnewrec>'
     + '<SessionId>'+sessionId+'</SessionId>'
     + '<ContasAReceberEmpresa>18</ContasAReceberEmpresa>'
     + '<ContasAReceberCod></ContasAReceberCod>'
     + '<ContasAReceberOrigem>C</ContasAReceberOrigem>'
-    + '<ContasAReceberCodOrigem></ContasAReceberCodOrigem>'
-    + '<ContasAReceberCnpjOrigem>'+clienteCod+'</ContasAReceberCnpjOrigem>'
+    + '<ContasAReceberCodOrigem>'+codOrigem+'</ContasAReceberCodOrigem>'
+    + '<ContasAReceberCnpjOrigem>'+cnpjOrigem+'</ContasAReceberCnpjOrigem>'
     + '<ContasAReceberUkeyOrigem></ContasAReceberUkeyOrigem>'
     + '<ContasAReceberOrigemNomeFantasia></ContasAReceberOrigemNomeFantasia>'
     + '<ContasAReceberOrigemRazaoSocial></ContasAReceberOrigemRazaoSocial>'
@@ -1615,15 +1620,15 @@ const WSGA_KEY   = '1956627D5DD6B6AB8668E3D0261FFF91';
 
 // Código do cliente/fornecedor no StarSoft para geração de REC
 const CLIENTE_COD = {
-  '02': 'CNPJ_PALLAS',
-  '18': 'CNPJ_CSC',
-  '26': '00475516000354',
-  '49': 'CNPJ_INTERNACIONAL',
+  '02': 'F1456',
+  '18': '06744',
+  '26': '00711',
+  '49': '280725',
   '69': '46083669225',
   '71': '849525695729',
   '81': '322655534899',
   '82': '300276325487',
-  '84': '00475516000354',
+  '84': '00711',
   '85': '567441376181',
 };
 
