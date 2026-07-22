@@ -1447,7 +1447,8 @@ function montarPayloadSAD(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   const tipoDoc = TD_MAP[tipoRateio] || 'TD-0000509';
   const ukeyOri = 'SOT__3C06_156605899B'; // Ukey real da ADM CENTRAL no StarSoft
   const serie   = e.cod + '-' + tipoRateio + '-' + linha.competenciaAAAMM;
-  const coment  = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
+  const coment  = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label
+    + ' <werp.option2>AG 3381 | CC 0007467-5</werp.option2>';
 
   // CRD no rateio SEM PONTOS (confirmado no wsga_soap.py que funciona)
   // Percentual: último item recebe resíduo para garantir soma exata 100%
