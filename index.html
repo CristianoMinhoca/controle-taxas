@@ -1447,8 +1447,7 @@ function montarPayloadSAD(e, linha, tipoRateio, valorTotal, crdsGrupo, sessionId
   const tipoDoc = TD_MAP[tipoRateio] || 'TD-0000509';
   const ukeyOri = 'SOT__3C06_156605899B'; // Ukey real da ADM CENTRAL no StarSoft
   const serie   = e.cod + '-' + tipoRateio + '-' + linha.competenciaAAAMM;
-  const coment  = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label
-    + ' <werp.option2>AG 3381 | CC 0007467-5</werp.option2>';
+  const coment  = 'Rateio ' + (TIPO_LABEL[tipoRateio]||tipoRateio) + ' ' + e.cod + ' ' + e.nome + ' ' + linha.label;
 
   // CRD no rateio SEM PONTOS (confirmado no wsga_soap.py que funciona)
   // Percentual: último item recebe resíduo para garantir soma exata 100%
@@ -1668,7 +1667,14 @@ async function criarDocumentoViaProxy(sessionId, empresa, soapPayload, tipoServi
     + '</WsGaService.' + tipoServico + '>'
     + '</soapenv:Body></soapenv:Envelope>';
   const res = await chamarProxy({ action: tipoServico, xml });
-  if(res.op_status !== '1') throw new Error(res.op_descr || res.error || 'Falha ao criar documento');
+  if(res.op_status !== '1'){
+    const descr = res.op_descr || res.error || '';
+    const semOrcamento = descr.toLowerCase().includes('orçamento') || descr.toLowerCase().includes('orcamento') || descr.toLowerCase().includes('segurança') || descr.toLowerCase().includes('security') || descr.toLowerCase().includes('permissão');
+    const msgErro = semOrcamento
+      ? `Orçamento insuficiente ou não configurado para esta competência. Verifique o orçamento no StarSoft e tente novamente.`
+      : descr || 'Falha ao criar documento';
+    throw new Error(msgErro);
+  }
   return { ok: true, codigo: res.op_codigo, ukey: res.op_ukey, numerSad: res.numero_sad || res.op_codigo || res.op_ukey };
 }
 
